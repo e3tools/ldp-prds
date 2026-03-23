@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PRD — COSOMIS LDP Prototypes</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        :root {
+            --blue: #3498db; --blue-dark: #2374ab; --blue-light: #eaf4fd;
+            --green: #28a745; --yellow: #ffc107; --red: #dc3545; --orange: #f39c12;
+            --gray-50: #f9fafb; --gray-100: #f3f4f6; --gray-200: #e5e7eb;
+            --gray-300: #d1d5db; --gray-500: #6b7280; --gray-700: #374151; --gray-900: #111827;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Inter', sans-serif; color: var(--gray-700); background: var(--gray-50); line-height: 1.7; }
+
+        /* ── Layout ───────────────────────────────────────── */
+        .page-wrapper { display: flex; min-height: 100vh; }
+        .sidebar {
+            width: 280px; position: fixed; top: 0; left: 0; bottom: 0;
+            background: var(--gray-900); color: #fff; overflow-y: auto;
+            padding: 24px 0; z-index: 100;
+        }
+        .sidebar-header { padding: 0 20px 20px; border-bottom: 1px solid rgba(255,255,255,.1); margin-bottom: 16px; }
+        .sidebar-header h1 { font-size: 16px; font-weight: 700; color: #fff; }
+        .sidebar-header p { font-size: 11px; color: var(--gray-500); margin-top: 4px; }
+        .sidebar-section { padding: 8px 20px; }
+        .sidebar-section-title { font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--gray-500); margin-bottom: 8px; font-weight: 600; }
+        .sidebar a {
+            display: block; padding: 8px 12px; margin: 2px 0; border-radius: 6px;
+            color: var(--gray-300); font-size: 13px; text-decoration: none; transition: all .15s;
+        }
+        .sidebar a:hover { background: rgba(255,255,255,.08); color: #fff; }
+        .sidebar a.active { background: var(--blue); color: #fff; font-weight: 500; }
+        .sidebar a i { width: 20px; text-align: center; margin-right: 8px; font-size: 11px; }
+        .sidebar .proto-link {
+            display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+            margin: 4px 0; border-radius: 8px; border: 1px solid rgba(255,255,255,.1);
+            color: #fff; font-size: 12px; font-weight: 500; text-decoration: none; transition: all .15s;
+        }
+        .sidebar .proto-link:hover { background: var(--blue); border-color: var(--blue); transform: translateX(3px); }
+        .sidebar .proto-link .proto-icon { width: 32px; height: 32px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+
+        .main { margin-left: 280px; padding: 40px 48px; max-width: 960px; }
+
+        /* ── Typography ───────────────────────────────────── */
+        h2 { font-size: 28px; font-weight: 800; color: var(--gray-900); margin: 56px 0 8px; padding-top: 24px; border-top: 2px solid var(--gray-200); }
+        h2:first-of-type { border-top: 0; margin-top: 0; }
+        h3 { font-size: 20px; font-weight: 700; color: var(--gray-900); margin: 36px 0 8px; }
+        h4 { font-size: 16px; font-weight: 600; color: var(--blue-dark); margin: 24px 0 6px; }
+        p, li { font-size: 14px; line-height: 1.75; }
+        p { margin-bottom: 12px; }
+
+        /* ── Prototype cards ──────────────────────────────── */
+        .proto-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 24px 0; }
+        .proto-card {
+            border: 1px solid var(--gray-200); border-radius: 12px; overflow: hidden;
+            background: #fff; transition: all .2s; text-decoration: none; color: inherit;
+        }
+        .proto-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,.1); transform: translateY(-3px); }
+        .proto-card-img { height: 140px; display: flex; align-items: center; justify-content: center; font-size: 48px; color: #fff; }
+        .proto-card-body { padding: 16px; }
+        .proto-card-body h4 { margin: 0 0 4px; font-size: 15px; color: var(--gray-900); }
+        .proto-card-body p { font-size: 12px; color: var(--gray-500); margin: 0; }
+
+        /* ── Badge ────────────────────────────────────────── */
+        .badge { display: inline-block; padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 600; }
+        .badge-blue { background: var(--blue-light); color: var(--blue-dark); }
+        .badge-green { background: #d4edda; color: #155724; }
+        .badge-orange { background: #fff3cd; color: #856404; }
+        .badge-red { background: #f8d7da; color: #721c24; }
+
+        /* ── Table ────────────────────────────────────────── */
+        table { width: 100%; border-collapse: collapse; margin: 16px 0 24px; font-size: 13px; }
+        th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--gray-200); }
+        th { background: var(--gray-100); font-weight: 600; color: var(--gray-900); font-size: 12px; text-transform: uppercase; letter-spacing: .5px; }
+        tr:last-child td { border-bottom: 0; }
+        td code { background: var(--gray-100); padding: 2px 6px; border-radius: 4px; font-size: 12px; }
+
+        /* ── User story cards ─────────────────────────────── */
+        .story-card {
+            background: #fff; border: 1px solid var(--gray-200); border-radius: 10px;
+            padding: 20px 24px; margin: 16px 0;
+            border-left: 4px solid var(--blue);
+        }
+        .story-card .story-id { font-size: 11px; font-weight: 700; color: var(--blue); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+        .story-card .story-text { font-size: 14px; font-style: italic; color: var(--gray-700); margin-bottom: 12px; }
+        .story-card .ac-title { font-size: 12px; font-weight: 700; color: var(--gray-900); margin-bottom: 6px; }
+        .story-card ul { padding-left: 18px; margin: 0; }
+        .story-card li { font-size: 13px; margin-bottom: 4px; }
+        .story-card li::marker { color: var(--blue); }
+
+        /* ── Flow diagram ─────────────────────────────────── */
+        .flow-row { display: flex; align-items: center; gap: 0; margin: 20px 0; flex-wrap: wrap; }
+        .flow-step {
+            padding: 10px 18px; border-radius: 8px; font-size: 12px; font-weight: 600;
+            background: var(--blue-light); color: var(--blue-dark); white-space: nowrap;
+        }
+        .flow-arrow { font-size: 18px; color: var(--gray-300); padding: 0 6px; }
+
+        /* ── Metric cards ─────────────────────────────────── */
+        .metric-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 16px 0; }
+        .metric-card {
+            background: #fff; border: 1px solid var(--gray-200); border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .metric-card .metric-name { font-size: 13px; font-weight: 600; color: var(--gray-900); margin-bottom: 4px; }
+        .metric-card .metric-formula { font-size: 12px; color: var(--gray-500); font-family: 'Courier New', monospace; background: var(--gray-100); padding: 4px 8px; border-radius: 4px; display: inline-block; margin-bottom: 4px; }
+        .metric-card .metric-desc { font-size: 12px; color: var(--gray-500); }
+
+        /* ── Callout ──────────────────────────────────────── */
+        .callout { padding: 16px 20px; border-radius: 8px; margin: 16px 0; font-size: 13px; }
+        .callout-blue { background: var(--blue-light); border-left: 4px solid var(--blue); }
+        .callout-green { background: #d4edda; border-left: 4px solid var(--green); }
+        .callout-orange { background: #fff3cd; border-left: 4px solid var(--orange); }
+
+        /* ── Responsive ───────────────────────────────────── */
+        @media (max-width: 900px) {
+            .sidebar { display: none; }
+            .main { margin-left: 0; padding: 24px 20px; }
+            .proto-cards { grid-template-columns: 1fr; }
+            .metric-grid { grid-template-columns: 1fr; }
+        }
+
+        /* ── Header hero ──────────────────────────────────── */
+        .hero {
+            background: linear-gradient(135deg, var(--gray-900), var(--blue-dark));
+            color: #fff; padding: 48px 40px; border-radius: 16px; margin-bottom: 40px;
+        }
+        .hero h1 { font-size: 32px; font-weight: 800; margin-bottom: 8px; }
+        .hero .subtitle { font-size: 15px; color: rgba(255,255,255,.7); }
+        .hero .meta { display: flex; gap: 24px; margin-top: 20px; font-size: 12px; color: rgba(255,255,255,.5); }
+        .hero .meta span { display: flex; align-items: center; gap: 6px; }
+
+        /* ── TOC ──────────────────────────────────────────── */
+        .toc { background: #fff; border: 1px solid var(--gray-200); border-radius: 12px; padding: 24px 28px; margin: 24px 0; }
+        .toc h3 { margin: 0 0 12px; font-size: 14px; }
+        .toc ol { padding-left: 20px; margin: 0; }
+        .toc li { font-size: 13px; margin-bottom: 6px; }
+        .toc a { color: var(--blue); text-decoration: none; }
+        .toc a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+<div class="page-wrapper">
+
+    <!-- ═══════════════════════════════════════════════════════
+         SIDEBAR NAVIGATION
+         ═══════════════════════════════════════════════════════ -->
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <h1>COSOMIS LDP</h1>
+            <p>Product Requirements Document</p>
+        </div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">Document</div>
+            <a href="#overview"><i class="fas fa-eye"></i> Overview</a>
+            <a href="#hierarchy"><i class="fas fa-sitemap"></i> Admin Hierarchy</a>
+            <a href="#proto-canton"><i class="fas fa-layer-group"></i> Canton Profile</a>
+            <a href="#proto-commune"><i class="fas fa-city"></i> Commune Profile</a>
+            <a href="#proto-gallery"><i class="fas fa-images"></i> Gallery</a>
+            <a href="#user-stories"><i class="fas fa-user"></i> User Stories</a>
+            <a href="#user-flows"><i class="fas fa-route"></i> User Flows</a>
+            <a href="#hypotheses"><i class="fas fa-flask"></i> Hypotheses</a>
+            <a href="#success-metrics"><i class="fas fa-chart-line"></i> Success Metrics</a>
+        </div>
+
+        <div class="sidebar-section" style="margin-top: 16px;">
+            <div class="sidebar-section-title">Live Prototypes</div>
+            <a href="canton_profile.html" target="_blank" class="proto-link">
+                <div class="proto-icon" style="background: linear-gradient(135deg, #28a745, #20c997);"><i class="fas fa-layer-group"></i></div>
+                Canton Profile
+            </a>
+            <a href="commune_profile.html" target="_blank" class="proto-link">
+                <div class="proto-icon" style="background: linear-gradient(135deg, #3498db, #6f42c1);"><i class="fas fa-city"></i></div>
+                Commune Profile
+            </a>
+            <a href="../benin-ldp/prototypes/gallery-prototype.html" target="_blank" class="proto-link">
+                <div class="proto-icon" style="background: linear-gradient(135deg, #f39c12, #e74c3c);"><i class="fas fa-images"></i></div>
+                Gallery
+            </a>
+        </div>
+    </nav>
+
+    <!-- ═══════════════════════════════════════════════════════
+         MAIN CONTENT
+         ═══════════════════════════════════════════════════════ -->
+    <main class="main">
+
+        <!-- Hero -->
+        <div class="hero">
+            <h1>COSOMIS — Local Development Planning</h1>
+            <div class="subtitle">Product Requirements Document for Canton Profile, Commune Profile, and Gallery Prototypes</div>
+            <div class="meta">
+                <span><i class="fas fa-calendar"></i> March 2026</span>
+                <span><i class="fas fa-code-branch"></i> v1.0</span>
+                <span><i class="fas fa-globe-africa"></i> Benin CDD Program</span>
+                <span><i class="fas fa-users"></i> World Bank</span>
+            </div>
+        </div>
+
+        <!-- Prototypes quick-access -->
+        <div class="proto-cards">
+            <a href="canton_profile.html" target="_blank" class="proto-card">
+                <div class="proto-card-img" style="background: linear-gradient(135deg, #28a745, #20c997);"><i class="fas fa-layer-group"></i></div>
+                <div class="proto-card-body"><h4>Canton Profile</h4><p>Parent of Village — village-level progress funnel &amp; map</p></div>
+            </a>
+            <a href="commune_profile.html" target="_blank" class="proto-card">
+                <div class="proto-card-img" style="background: linear-gradient(135deg, #3498db, #6f42c1);"><i class="fas fa-city"></i></div>
+                <div class="proto-card-body"><h4>Commune Profile</h4><p>Parent of Canton — canton-aggregated funnel &amp; map</p></div>
+            </a>
+            <a href="../benin-ldp/prototypes/gallery-prototype.html" target="_blank" class="proto-card">
+                <div class="proto-card-img" style="background: linear-gradient(135deg, #f39c12, #e74c3c);"><i class="fas fa-images"></i></div>
+                <div class="proto-card-body"><h4>Gallery</h4><p>Cross-cutting photo &amp; document browser with filters</p></div>
+            </a>
+        </div>
+
+        <!-- ════════════════════════════════════════════════════
+             1. OVERVIEW
+             ════════════════════════════════════════════════════ -->
+        <h2 id="overview">1. Overview</h2>
+
+        <h3>1.1 Problem Statement</h3>
+        <p>COSOMIS currently provides detailed profile pages only at the <strong>Village</strong> level. Stakeholders responsible for Cantons (arrondissements) and Communes have no dedicated view to monitor planning progress, investment priorities, or geographic distribution of subprojects across the communities they oversee. Additionally, the platform lacks a centralized way to browse, filter, and download field-collected photos and documents attached to planning tasks.</p>
+
+        <h3>1.2 Proposed Solution</h3>
+        <p>Three new interfaces that extend the existing COSOMIS platform:</p>
+        <table>
+            <tr><th>Prototype</th><th>Level</th><th>Core Purpose</th></tr>
+            <tr><td><strong>Canton Profile</strong></td><td>Direct parent of Village</td><td>Aggregate village-level data and expose a planning progress funnel showing how each village is moving through the 4 planning phases</td></tr>
+            <tr><td><strong>Commune Profile</strong></td><td>Parent of Canton (grandparent of Village)</td><td>Two-tier aggregation — group villages by Canton — with filters, investment tracking, and an interactive map with switchable layers</td></tr>
+            <tr><td><strong>Gallery</strong></td><td>Cross-cutting (all levels)</td><td>Searchable, filterable media browser for photos and documents attached to planning tasks, with lightbox viewing and bulk download</td></tr>
+        </table>
+
+        <h3>1.3 Target Users</h3>
+        <table>
+            <tr><th>User</th><th>Role</th><th>Primary Need</th></tr>
+            <tr><td>Canton Chief / Arrondissement Officer</td><td>Local government official</td><td>Track which villages have completed their planning cycle and identify lagging ones</td></tr>
+            <tr><td>Commune Mayor / Municipal Officer</td><td>Municipal authority</td><td>Overview of all cantons, funding gaps, geographic priority distribution</td></tr>
+            <tr><td>World Bank Project Manager</td><td>Donor / oversight</td><td>Portfolio-wide progress dashboards, evidence of field activities via gallery</td></tr>
+            <tr><td>Facilitator / Field Agent</td><td>Operational staff</td><td>Upload and browse evidence, verify task completion through photos</td></tr>
+        </table>
+
+        <!-- ════════════════════════════════════════════════════
+             2. HIERARCHY
+             ════════════════════════════════════════════════════ -->
+        <h2 id="hierarchy">2. Administrative Hierarchy</h2>
+        <p>The COSOMIS data model uses a self-referencing <code>AdministrativeLevel</code> entity with a <code>parent</code> foreign key. The hierarchy, from top to bottom:</p>
+
+        <div class="flow-row">
+            <div class="flow-step" style="background: var(--gray-200); color: var(--gray-700);">Country</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step" style="background: var(--gray-200); color: var(--gray-700);">Department</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step" style="background: #d6bcfa; color: #553c9a;"><strong>Commune</strong></div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step" style="background: #c6f6d5; color: #22543d;"><strong>Canton</strong></div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step"><strong>Village</strong> (existing)</div>
+        </div>
+
+        <div class="callout callout-blue">
+            <strong>Key design principle:</strong> The planning cycle (Phases → Activities → Tasks) is tracked at the <strong>Village</strong> level only. At Canton and Commune levels, the system shows a <strong>progress funnel</strong> — an aggregation of how many child villages have completed, are in progress, or have not started each phase.
+        </div>
+
+        <!-- ════════════════════════════════════════════════════
+             3. CANTON PROFILE
+             ════════════════════════════════════════════════════ -->
+        <h2 id="proto-canton">3. Canton Profile</h2>
+        <p><a href="canton_profile.html" target="_blank" style="color: var(--blue); font-weight: 600;"><i class="fas fa-external-link-alt"></i> Open prototype →</a></p>
+
+        <h3>3.1 Purpose</h3>
+        <p>The Canton Profile gives canton-level authorities a single view to understand the state of all villages under their jurisdiction. It answers: <em>"How are my villages doing overall, where are the investment priorities, and which villages need attention?"</em></p>
+
+        <h3>3.2 Layout</h3>
+        <table>
+            <tr><th>Section</th><th>Description</th></tr>
+            <tr><td><strong>Breadcrumb</strong></td><td>Benin / Department / Commune / <strong>Canton Name</strong> — with links to parent levels</td></tr>
+            <tr><td><strong>Image Carousel</strong></td><td>Photos from the canton's villages (from <code>Attachment</code> model). Overlay shows canton name and parent hierarchy.</td></tr>
+            <tr><td><strong>Population Card</strong></td><td>Demographic breakdown: total, men, women, young, elder, persons with disabilities, agriculture, breeders, ethnic groups</td></tr>
+            <tr><td><strong>Villages Summary Card</strong></td><td>Quick stats: number of villages, CVDs, priorities identified, total estimated cost</td></tr>
+        </table>
+
+        <h3>3.3 Tabs</h3>
+
+        <h4>Tab: Priorities</h4>
+        <p>Shows all investment priorities from villages that belong to this canton. Aggregates <code>Investment</code> records where <code>administrative_level.parent = canton</code>. Columns include ranking, sector, description, endorsement indicators (Youth, Women, Ethnic Minorities, Agriculturists), beneficiaries, estimated cost, funding source, climate contribution, and cart actions for unfunded priorities.</p>
+
+        <h4>Tab: Villages</h4>
+        <p>Lists all villages grouped by their CVD (Comité Villageois de Développement). Shows population, planning status, number of priorities, and languages spoken. Includes a text search to filter the table.</p>
+
+        <h4>Tab: Village Progress</h4>
+        <p>The core innovation replacing the village-level "Planning Cycle" tab. Since planning phases only exist at village level, this tab provides a <strong>funnel view</strong> showing how each village is progressing through the 4 planning phases.</p>
+
+        <div class="callout callout-green">
+            <strong>Why a funnel?</strong> Canton officials don't need to manage individual tasks — they need to know which villages are stuck and where resources should be redirected. The funnel immediately highlights bottlenecks.
+        </div>
+
+        <p><strong>Components:</strong></p>
+        <table>
+            <tr><th>Component</th><th>Description</th></tr>
+            <tr><td>Summary counters</td><td>4 stat cards: villages completed, in progress, not started, and overall completion %</td></tr>
+            <tr><td>Per-village progress bars</td><td>Horizontal stacked bars showing completed (green), in progress (yellow), and not started (red) phases for each village</td></tr>
+            <tr><td>Phase breakdown table</td><td>Matrix of villages × 4 phases with status dots, plus priorities identified count</td></tr>
+        </table>
+
+        <h4>Tab: Map</h4>
+        <p>Interactive Leaflet.js map showing all villages within the canton. Each village is represented by a circle marker colored by its top-priority sector. Clicking a marker opens a popup with the priority name, estimated cost, and funding status. A sidebar lists all subprojects, and clicking an item flies the map to that village.</p>
+
+        <h4>Tab: Infrastructure &amp; Services</h4>
+        <p>Placeholder for future development. Will show infrastructure inventory across villages (schools, health centers, water points, roads).</p>
+
+        <h3>3.4 Metric Calculations</h3>
+        <div class="metric-grid">
+            <div class="metric-card">
+                <div class="metric-name">Total Population</div>
+                <div class="metric-formula">SUM(village.total_population) for village in canton.children</div>
+                <div class="metric-desc">Aggregated from all child villages' demographic data</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-name">Overall Completion %</div>
+                <div class="metric-formula">SUM(village_completed_phases) / (total_villages × 4) × 100</div>
+                <div class="metric-desc">Each village has 4 phases. Count all completed phases across all villages, divide by theoretical max.</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-name">Villages Completed</div>
+                <div class="metric-formula">COUNT(village) WHERE all 4 phases.status == 'completed'</div>
+                <div class="metric-desc">A village is "completed" only when all 4 phases have status = completed</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-name">Villages In Progress</div>
+                <div class="metric-formula">COUNT(village) WHERE any phase.status == 'in progress' AND NOT all_completed</div>
+                <div class="metric-desc">At least one phase started but not all 4 are completed</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-name">Villages Not Started</div>
+                <div class="metric-formula">COUNT(village) WHERE all phases.status == 'not started'</div>
+                <div class="metric-desc">No phase has been started in this village</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-name">Total Estimated Cost</div>
+                <div class="metric-formula">SUM(investment.estimated_cost) for investment in canton_investments</div>
+                <div class="metric-desc">Sum of all Investment records linked to villages under this canton</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-name">Phase Status (per village)</div>
+                <div class="metric-formula">phase.get_status() → checks tasks within activities</div>
+                <div class="metric-desc">A phase is completed when all its activities' tasks are completed. In progress when at least one task is completed but not all. Not started when no tasks are completed. Derived from Task.status field.</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-name">Priorities Identified</div>
+                <div class="metric-formula">COUNT(Investment) WHERE investment.administrative_level.parent == canton</div>
+                <div class="metric-desc">Number of investment records linked to child villages</div>
+            </div>
+        </div>
+
+        <!-- ════════════════════════════════════════════════════
+             4. COMMUNE PROFILE
+             ════════════════════════════════════════════════════ -->
+        <h2 id="proto-commune">4. Commune Profile</h2>
+        <p><a href="commune_profile.html" target="_blank" style="color: var(--blue); font-weight: 600;"><i class="fas fa-external-link-alt"></i> Open prototype →</a></p>
+
+        <h3>4.1 Purpose</h3>
+        <p>The Commune Profile provides municipal-level oversight across all cantons. It answers: <em>"Which cantons are on track, where is investment needed most, and how do I compare subproject distribution geographically?"</em></p>
+
+        <h3>4.2 Layout</h3>
+        <table>
+            <tr><th>Section</th><th>Description</th></tr>
+            <tr><td><strong>Image Carousel</strong></td><td>Photos from the commune's territory, with overlay showing commune name and department</td></tr>
+            <tr><td><strong>Population Card</strong></td><td>Same demographic breakdown as Canton, aggregated across all villages in the commune</td></tr>
+            <tr><td><strong>Commune Overview Card</strong></td><td>Number of cantons, villages, priorities identified, total estimated cost, communal development plan download link, and assigned facilitator</td></tr>
+            <tr><td><strong>Summary Stats Row</strong></td><td>4 highlight cards: cantons count, villages count, priorities identified, total estimated cost</td></tr>
+        </table>
+
+        <h3>4.3 Tabs</h3>
+
+        <h4>Tab: Priorities</h4>
+        <p>Two sub-views toggled by pills:</p>
+        <table>
+            <tr><th>Sub-view</th><th>Description</th></tr>
+            <tr><td><strong>Investment Types</strong></td><td>Aggregated by investment type and sector across the entire commune. Shows funding need, endorsement columns (J/F/ME/AE), and funding status.</td></tr>
+            <tr><td><strong>Individual Villages</strong></td><td>Flat list of every village-level priority with its canton, sector, endorsements, village ranking, and estimated cost.</td></tr>
+        </table>
+        <p>Both sub-views share a <strong>filter bar</strong> with 5 dropdowns: Sector, Type, Endorsed By, Climate Contribution, and Funding Status. Apply / Reset actions.</p>
+
+        <h4>Tab: Villages</h4>
+        <p>Full table of all villages in the commune with columns: name, parent canton (linked to canton profile), population, invested capital, required capital, per capita invested, and per capita required. Per-capita metrics allow comparing investment equity across villages.</p>
+
+        <h4>Tab: Cantons</h4>
+        <p>Aggregated view at the canton level showing: canton name (linked to canton profile), number of villages, population, priorities count, invested amount, required amount, and planning status with completion percentage.</p>
+
+        <h4>Tab: Canton Progress</h4>
+        <p>Two-tier progress funnel. At the top, commune-wide summary counters (villages completed, in progress, not started, overall %). Below, each canton is an <strong>expandable accordion block</strong> with a header showing the canton name, village count, completion %, mini progress bar, and status counts. Expanding a canton reveals per-village progress bars — identical to the Canton Profile's funnel, but nested inside the commune view.</p>
+
+        <div class="callout callout-orange">
+            <strong>Two-tier aggregation:</strong> Commune → Canton → Village. This is the key difference from the Canton Profile. The collapsible structure prevents information overload while still allowing drill-down to any village.
+        </div>
+
+        <h4>Tab: Map</h4>
+        <p>Interactive Leaflet.js map with <strong>three switchable layers</strong>:</p>
+        <table>
+            <tr><th>Layer</th><th>Marker Color</th><th>Purpose</th></tr>
+            <tr><td><strong>Priorities</strong></td><td>By sector (Education = orange, Health = green, Water = cyan, Agriculture = blue, Transport = gray)</td><td>Understand spatial distribution of priority types</td></tr>
+            <tr><td><strong>Subprojects</strong></td><td>Same sector colors, larger semi-transparent rings</td><td>Highlight only villages with active subprojects</td></tr>
+            <tr><td><strong>Planning Progress</strong></td><td>Green (completed), Yellow (in progress), Red (not started)</td><td>Identify geographic clusters of stalled planning</td></tr>
+        </table>
+        <p>The sidebar groups subprojects by canton, and clicking an item flies the map to that location and opens the popup.</p>
+
+        <h4>Tab: Subprojects</h4>
+        <p>Table of all subprojects in the commune with ranking, sector, endorsement indicators, beneficiary count, estimated cost, responsible structure, and climate contribution.</p>
+
+        <h3>4.4 Metric Calculations</h3>
+        <div class="metric-grid">
+            <div class="metric-card">
+                <div class="metric-name">Population (all fields)</div>
+                <div class="metric-formula">SUM(village.field) for village in commune.descendants(type='village')</div>
+                <div class="metric-desc">Recursively sums across all villages in all cantons under this commune</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-name">Overall Completion %</div>
+                <div class="metric-formula">SUM(all_village_completed_phases) / (total_villages_in_commune × 4) × 100</div>
+                <div class="metric-desc">Same formula as Canton but across all villages in all cantons</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-name">Per Capita Invested</div>
+                <div class="metric-formula">village.total_funded / village.total_population</div>
+                <div class="metric-desc">How much investment each person in that village has received. Used to identify equity gaps.</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-name">Per Capita Required</div>
+                <div class="metric-formula">village.total_estimated_cost / village.total_population</div>
+                <div class="metric-desc">Investment still needed per person. High values indicate underserved villages.</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-name">Canton Completion %</div>
+                <div class="metric-formula">SUM(completed_phases in canton) / (canton_village_count × 4) × 100</div>
+                <div class="metric-desc">Planning completion rate scoped to a single canton</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-name">Total Estimated Cost</div>
+                <div class="metric-formula">SUM(investment.estimated_cost) for all investments in commune</div>
+                <div class="metric-desc">Sum across all Investment records where administrative_level is descendant of commune</div>
+            </div>
+        </div>
+
+        <!-- ════════════════════════════════════════════════════
+             5. GALLERY
+             ════════════════════════════════════════════════════ -->
+        <h2 id="proto-gallery">5. Gallery</h2>
+        <p><a href="../benin-ldp/prototypes/gallery-prototype.html" target="_blank" style="color: var(--blue); font-weight: 600;"><i class="fas fa-external-link-alt"></i> Open prototype →</a></p>
+
+        <h3>5.1 Purpose</h3>
+        <p>The Gallery provides a centralized, filterable media browser for all photos and documents uploaded as evidence during planning activities. It answers: <em>"What evidence do we have from the field? Can I find, preview, and download photos from a specific village, phase, or activity?"</em></p>
+
+        <h3>5.2 Layout</h3>
+        <table>
+            <tr><th>Section</th><th>Description</th></tr>
+            <tr><td><strong>Top bar</strong></td><td>Title, sort dropdown (newest/oldest/by location), filter toggle button with active filter count, and a download button that appears when items are selected</td></tr>
+            <tr><td><strong>Filter chips</strong></td><td>Active filters displayed as removable pills with an "X" and a "Clear all" link</td></tr>
+            <tr><td><strong>Filter sidebar</strong></td><td>Collapsible panel with hierarchical location filters, attachment type selector, and phase/activity/task dropdowns</td></tr>
+            <tr><td><strong>Gallery grid</strong></td><td>Responsive card grid (auto-fill, min 280px columns) showing image thumbnails with metadata</td></tr>
+            <tr><td><strong>Lightbox</strong></td><td>Full-screen image viewer with navigation, keyboard support, and download</td></tr>
+            <tr><td><strong>Bulk action bar</strong></td><td>Floating bar when items are checked: selection count, Download ZIP, Deselect</td></tr>
+        </table>
+
+        <h3>5.3 Filter System</h3>
+        <table>
+            <tr><th>Filter Group</th><th>Options</th><th>Data Source</th></tr>
+            <tr><td><strong>Attachment Type</strong></td><td>Photos / Docs / Both (pill toggle)</td><td><code>Attachment.type</code></td></tr>
+            <tr><td><strong>Location Hierarchy</strong></td><td>Department → Commune → City → Village (cascading dropdowns)</td><td><code>AdministrativeLevel.parent</code> chain</td></tr>
+            <tr><td><strong>Quick Search</strong></td><td>Text input searching village names</td><td><code>AdministrativeLevel.name</code> LIKE search</td></tr>
+            <tr><td><strong>Planning Phase</strong></td><td>Phase 1 – Preparation, Phase 2 – Implementation, Phase 3 – Evaluation</td><td><code>Phase.name</code></td></tr>
+            <tr><td><strong>Activity</strong></td><td>Dynamic based on selected phase</td><td><code>Activity.phase_id</code></td></tr>
+            <tr><td><strong>Task</strong></td><td>Dynamic based on selected activity</td><td><code>Task.activity_id</code></td></tr>
+        </table>
+
+        <h3>5.4 Gallery Card Anatomy</h3>
+        <table>
+            <tr><th>Element</th><th>Description</th></tr>
+            <tr><td>Checkbox</td><td>Top-left corner, appears on hover. Used for bulk selection.</td></tr>
+            <tr><td>Image / Doc icon</td><td>Photo thumbnail or PDF icon for documents</td></tr>
+            <tr><td>Village name</td><td>Linked location label</td></tr>
+            <tr><td>Task title</td><td>The planning task this attachment relates to</td></tr>
+            <tr><td>Description</td><td>Max 2 lines, truncated with ellipsis</td></tr>
+            <tr><td>Status badge</td><td>Completed (green), In progress (blue), To do (gray)</td></tr>
+            <tr><td>Date</td><td>Upload or creation date</td></tr>
+        </table>
+
+        <h3>5.5 Lightbox</h3>
+        <p>Full-screen overlay viewer with: image counter (e.g. "3 / 12"), previous/next navigation buttons, keyboard controls (Escape to close, arrow keys to navigate), download button, and image metadata (task name, village, date) below the image.</p>
+
+        <h3>5.6 Interactions</h3>
+        <table>
+            <tr><th>Action</th><th>Result</th></tr>
+            <tr><td>Click card (not checkbox)</td><td>Opens lightbox at that image</td></tr>
+            <tr><td>Check card checkbox</td><td>Adds to bulk selection, shows floating action bar</td></tr>
+            <tr><td>Download ZIP</td><td>Packages all selected items into a ZIP archive</td></tr>
+            <tr><td>Remove filter chip</td><td>Removes that one filter, re-queries gallery</td></tr>
+            <tr><td>Clear all filters</td><td>Resets to unfiltered state</td></tr>
+            <tr><td>No results</td><td>Shows empty state with "Clear filters" CTA</td></tr>
+        </table>
+
+        <!-- ════════════════════════════════════════════════════
+             6. USER STORIES
+             ════════════════════════════════════════════════════ -->
+        <h2 id="user-stories">6. User Stories</h2>
+
+        <h3>6.1 Canton Profile Stories</h3>
+
+        <div class="story-card">
+            <div class="story-id">US-C01 — Canton overview</div>
+            <div class="story-text">"As a Canton Chief, I want to see a summary of all villages under my jurisdiction so that I can quickly assess the overall population and number of priorities."</div>
+            <div class="ac-title">Acceptance Criteria</div>
+            <ul>
+                <li>Population card shows aggregated demographics (total, men, women, young, elder, disabilities, agriculture, breeders, ethnic groups) summed from all child villages</li>
+                <li>Villages summary card shows total village count, CVD count, priority count, and total estimated cost</li>
+                <li>Image carousel displays photos from at least one child village's attachments, or a default image</li>
+            </ul>
+        </div>
+
+        <div class="story-card">
+            <div class="story-id">US-C02 — Village progress funnel</div>
+            <div class="story-text">"As a Canton Chief, I want to see which villages have completed their planning cycle and which are lagging, so that I can focus my support on villages that need it most."</div>
+            <div class="ac-title">Acceptance Criteria</div>
+            <ul>
+                <li>Summary counters show correct counts for completed, in-progress, and not-started villages</li>
+                <li>Overall completion % is calculated as total completed phases / (village_count × 4) × 100</li>
+                <li>Each village shows a horizontal stacked bar proportional to phases completed / in progress / not started</li>
+                <li>Phase breakdown table shows each of the 4 phases per village with a colored status dot</li>
+                <li>Village names are clickable links to the village profile page</li>
+            </ul>
+        </div>
+
+        <div class="story-card">
+            <div class="story-id">US-C03 — Canton investment map</div>
+            <div class="story-text">"As a Canton Chief, I want to see where investment priorities are located on a map so that I can understand the geographic distribution of needs."</div>
+            <div class="ac-title">Acceptance Criteria</div>
+            <ul>
+                <li>Map renders with OpenStreetMap tiles centered on the canton's geographic bounds</li>
+                <li>Each village with a priority shows a circle marker colored by sector</li>
+                <li>Clicking a marker shows popup with: village name, sector, priority description, estimated cost, funding status</li>
+                <li>Sidebar lists all subprojects; clicking an item pans/zooms the map to that village</li>
+                <li>Legend shows sector-to-color mapping</li>
+            </ul>
+        </div>
+
+        <div class="story-card">
+            <div class="story-id">US-C04 — Canton priorities table</div>
+            <div class="story-text">"As a World Bank PM, I want to review all investment priorities in a canton with their endorsement status, so that I can evaluate whether vulnerable groups are represented."</div>
+            <div class="ac-title">Acceptance Criteria</div>
+            <ul>
+                <li>Priorities table shows all investments from child villages with endorsement indicators (J, F, ME, AE)</li>
+                <li>Funded priorities display their funding source; unfunded show "Add to cart" action</li>
+                <li>Table supports pagination (DataTables, 10 rows per page)</li>
+            </ul>
+        </div>
+
+        <h3>6.2 Commune Profile Stories</h3>
+
+        <div class="story-card">
+            <div class="story-id">US-M01 — Canton-aggregated progress</div>
+            <div class="story-text">"As a Commune Mayor, I want to see planning progress grouped by canton so that I can compare cantons and know which ones are falling behind."</div>
+            <div class="ac-title">Acceptance Criteria</div>
+            <ul>
+                <li>Each canton appears as a collapsible accordion block with header showing: canton name, village count, completion %, mini progress bar, and status counts</li>
+                <li>Expanding a canton reveals per-village progress bars identical to the Canton Profile funnel</li>
+                <li>Summary counters at the top aggregate all villages across all cantons</li>
+                <li>At least one canton is expanded by default to demonstrate the drill-down pattern</li>
+            </ul>
+        </div>
+
+        <div class="story-card">
+            <div class="story-id">US-M02 — Investment equity analysis</div>
+            <div class="story-text">"As a Commune Mayor, I want to compare per-capita investment across villages so that I can identify underserved communities."</div>
+            <div class="ac-title">Acceptance Criteria</div>
+            <ul>
+                <li>Villages tab shows per capita invested (total_funded / population) and per capita required (estimated_cost / population)</li>
+                <li>Villages with zero invested capital are clearly visible (showing 0)</li>
+                <li>Each village row links to canton and village profiles</li>
+            </ul>
+        </div>
+
+        <div class="story-card">
+            <div class="story-id">US-M03 — Multi-layer map</div>
+            <div class="story-text">"As a World Bank PM, I want to switch between different map views (priorities, subprojects, planning progress) so that I can analyze geographic patterns from different angles."</div>
+            <div class="ac-title">Acceptance Criteria</div>
+            <ul>
+                <li>Three toggle buttons switch the active map layer: Priorities, Subprojects, Planning Progress</li>
+                <li>Only one layer is visible at a time; active button is highlighted</li>
+                <li>Legend updates dynamically to match the active layer's color scheme</li>
+                <li>Sidebar groups items by canton with section headers</li>
+            </ul>
+        </div>
+
+        <div class="story-card">
+            <div class="story-id">US-M04 — Priority filtering</div>
+            <div class="story-text">"As a Municipal Officer, I want to filter investment priorities by sector, endorsement group, and funding status so that I can prepare targeted reports."</div>
+            <div class="ac-title">Acceptance Criteria</div>
+            <ul>
+                <li>Filter bar provides 5 dropdowns: Sector, Type, Endorsed By, Climate Contribution, Funding Status</li>
+                <li>Apply button submits the filters; Reset clears all</li>
+                <li>Table updates to show only matching investments</li>
+                <li>Sub-tabs (Investment Types / Individual Villages) both respect the same filters</li>
+            </ul>
+        </div>
+
+        <h3>6.3 Gallery Stories</h3>
+
+        <div class="story-card">
+            <div class="story-id">US-G01 — Browse field evidence</div>
+            <div class="story-text">"As a World Bank PM, I want to browse all photos collected from the field filtered by location and planning phase, so that I can verify activities are actually taking place."</div>
+            <div class="ac-title">Acceptance Criteria</div>
+            <ul>
+                <li>Gallery grid shows photo thumbnails with village name, task title, status, and date</li>
+                <li>Filter sidebar allows filtering by department → commune → village (cascading), and phase → activity → task</li>
+                <li>Active filters appear as removable chips above the grid</li>
+                <li>Gallery count text updates to reflect filtered results (e.g. "Showing 12 photos in Abomey-Calavi")</li>
+            </ul>
+        </div>
+
+        <div class="story-card">
+            <div class="story-id">US-G02 — Full-screen preview</div>
+            <div class="story-text">"As a Facilitator, I want to view photos in a full-screen lightbox with navigation, so that I can review task evidence one by one without leaving the page."</div>
+            <div class="ac-title">Acceptance Criteria</div>
+            <ul>
+                <li>Clicking a card (not the checkbox) opens a full-screen lightbox</li>
+                <li>Lightbox shows current/total counter (e.g. "3 / 12")</li>
+                <li>Previous/Next buttons navigate between photos; Arrow keys and Escape also work</li>
+                <li>Image metadata (task name, village, date) is displayed below the image</li>
+                <li>Download button allows saving the individual photo</li>
+            </ul>
+        </div>
+
+        <div class="story-card">
+            <div class="story-id">US-G03 — Bulk download</div>
+            <div class="story-text">"As a World Bank PM, I want to select multiple photos and download them as a ZIP file, so that I can include field evidence in my reports."</div>
+            <div class="ac-title">Acceptance Criteria</div>
+            <ul>
+                <li>Each card has a checkbox that becomes visible on hover or when checked</li>
+                <li>When at least one item is checked, a floating action bar appears at the bottom with: selection count, "Download ZIP" button, and "Deselect" button</li>
+                <li>Download ZIP packages all selected attachments</li>
+                <li>Deselect clears all checkboxes and hides the action bar</li>
+            </ul>
+        </div>
+
+        <div class="story-card">
+            <div class="story-id">US-G04 — Empty state &amp; recovery</div>
+            <div class="story-text">"As any user, when my filters return no results, I want a clear message and a way to reset filters so that I'm not stuck on a blank screen."</div>
+            <div class="ac-title">Acceptance Criteria</div>
+            <ul>
+                <li>When no results match, an empty state shows an icon, message "No photos found", helpful suggestion text, and a "Clear filters" button</li>
+                <li>Clicking "Clear filters" resets all filter selections and reloads the full gallery</li>
+            </ul>
+        </div>
+
+        <!-- ════════════════════════════════════════════════════
+             7. USER FLOWS
+             ════════════════════════════════════════════════════ -->
+        <h2 id="user-flows">7. User Flows</h2>
+
+        <h3>7.1 Flow: Canton chief monitors village progress</h3>
+        <div class="flow-row">
+            <div class="flow-step">Login</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step">Navigate to Canton</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step">Review Summary Cards</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step">Open "Village Progress" tab</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step">Identify lagging village</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step">Click village link → Village Profile</div>
+        </div>
+        <p>The user starts at the Canton overview, notices Damé is at 0% in the progress funnel, clicks through to its Village Profile to investigate the blockers. This path should take <strong>under 30 seconds</strong> from Canton page load to identifying the problem village.</p>
+
+        <h3>7.2 Flow: Mayor compares canton investment equity</h3>
+        <div class="flow-row">
+            <div class="flow-step">Login</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step">Navigate to Commune</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step">Open "Villages" tab</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step">Sort by Per Capita Invested</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step">Identify 0 investment villages</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step">Switch to "Map" tab → Progress layer</div>
+        </div>
+        <p>The mayor reviews per-capita investment in the Villages tab, spots that Kpébouko has 0 invested capital, then switches to the Map with Planning Progress layer to see if it's a geographic pattern (e.g. remote villages being skipped).</p>
+
+        <h3>7.3 Flow: World Bank PM verifies field activities</h3>
+        <div class="flow-row">
+            <div class="flow-step">Login</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step">Open Gallery</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step">Filter: Commune + Phase 2</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step">Browse photos</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step">Open lightbox to review</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step">Select 5 photos → Download ZIP</div>
+        </div>
+        <p>The PM needs evidence for a progress report. They filter the gallery to Phase 2 in a specific commune, review photos in the lightbox, select the best ones, and download them as a ZIP for their report. Target: <strong>under 2 minutes</strong> from gallery load to having the ZIP file.</p>
+
+        <h3>7.4 Flow: Facilitator finds stalled cantons for field visit</h3>
+        <div class="flow-row">
+            <div class="flow-step">Login</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step">Navigate to Commune</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step">Open "Canton Progress" tab</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step">Spot red bars (Yankérou = 0%)</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step">Expand Canton accordion</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step">Plan field visits to 5 villages</div>
+        </div>
+        <p>The facilitator opens the Canton Progress funnel at commune level, immediately spots that Canton de Yankérou has zero progress across all 5 villages (all bars are red), and uses this information to plan their next field visit.</p>
+
+        <!-- ════════════════════════════════════════════════════
+             8. HYPOTHESES
+             ════════════════════════════════════════════════════ -->
+        <h2 id="hypotheses">8. Hypotheses</h2>
+
+        <table>
+            <tr><th style="width:40px">#</th><th>Hypothesis</th><th>Evidence Needed</th><th>Risk if Wrong</th></tr>
+            <tr>
+                <td><span class="badge badge-blue">H1</span></td>
+                <td><strong>Canton and Commune officials will use the progress funnel more than the raw village list</strong> to identify lagging villages, because the visual bar chart communicates status faster than reading a table.</td>
+                <td>Tab click analytics: Village Progress / Canton Progress tab should have higher engagement time than Villages tab.</td>
+                <td>Low. The funnel coexists with the table, so users can choose either.</td>
+            </tr>
+            <tr>
+                <td><span class="badge badge-green">H2</span></td>
+                <td><strong>The interactive map will be the primary discovery tool for geographic patterns.</strong> Users will identify clusters of unfunded or stalled villages by switching map layers rather than reading tables.</td>
+                <td>Track layer toggle frequency. Users who toggle at least 2 layers per session are discovering patterns.</td>
+                <td>Medium. If the map is slow to load or coordinates are missing, users will fall back to tables.</td>
+            </tr>
+            <tr>
+                <td><span class="badge badge-orange">H3</span></td>
+                <td><strong>The gallery's hierarchical location filter will be the most-used filter axis</strong> (over phase/activity), because users think in terms of geography first ("show me photos from village X").</td>
+                <td>Track which filter dropdowns are changed most frequently.</td>
+                <td>Low. All filters remain available regardless.</td>
+            </tr>
+            <tr>
+                <td><span class="badge badge-blue">H4</span></td>
+                <td><strong>Bulk download (ZIP) will significantly reduce the time PMs spend preparing progress reports</strong>, replacing the current workflow of downloading photos one by one from individual village profiles.</td>
+                <td>Compare report preparation time before/after feature launch via user interviews.</td>
+                <td>Low. Even without ZIP, the gallery filter + lightbox is an improvement over navigating village by village.</td>
+            </tr>
+            <tr>
+                <td><span class="badge badge-red">H5</span></td>
+                <td><strong>Two-tier aggregation (Commune → Canton → Village) will not cause information overload.</strong> Users will understand the collapsible accordion pattern and use it to drill down rather than being confused.</td>
+                <td>Usability testing: >80% of test users can find a specific village's progress within 20 seconds.</td>
+                <td>High. If the accordion is confusing, the Commune progress tab becomes useless. Mitigation: default one canton open.</td>
+            </tr>
+            <tr>
+                <td><span class="badge badge-green">H6</span></td>
+                <td><strong>Per-capita investment metrics will surface equity issues</strong> that raw totals hide. Officials will use per-capita columns to advocate for underserved villages in budget discussions.</td>
+                <td>Track whether villages with low per-capita investment receive higher future allocations.</td>
+                <td>Medium. Per-capita may be confusing for some users. Tooltip explanations will help.</td>
+            </tr>
+        </table>
+
+        <!-- ════════════════════════════════════════════════════
+             9. SUCCESS METRICS
+             ════════════════════════════════════════════════════ -->
+        <h2 id="success-metrics">9. Success Metrics</h2>
+
+        <h3>9.1 Adoption Metrics</h3>
+        <table>
+            <tr><th>Metric</th><th>Target</th><th>Measurement</th></tr>
+            <tr><td>Canton Profile weekly active users</td><td>≥ 60% of canton-level accounts</td><td>Unique page views / total canton accounts per week</td></tr>
+            <tr><td>Commune Profile weekly active users</td><td>≥ 50% of commune-level accounts</td><td>Unique page views / total commune accounts per week</td></tr>
+            <tr><td>Gallery weekly active users</td><td>≥ 40% of all active users</td><td>Gallery page views / total active users per week</td></tr>
+        </table>
+
+        <h3>9.2 Engagement Metrics</h3>
+        <table>
+            <tr><th>Metric</th><th>Target</th><th>Measurement</th></tr>
+            <tr><td>Funnel tab engagement</td><td>≥ 3 minutes average time on Village Progress / Canton Progress tabs</td><td>Tab open duration tracking</td></tr>
+            <tr><td>Map layer toggles per session</td><td>≥ 2 layer switches per session</td><td>Click events on layer toggle buttons</td></tr>
+            <tr><td>Gallery photos viewed per session</td><td>≥ 8 photos opened in lightbox</td><td>Lightbox open events per session</td></tr>
+            <tr><td>Drill-through rate</td><td>≥ 30% of canton profile visits drill through to a village profile</td><td>Click events on village links from the funnel</td></tr>
+        </table>
+
+        <h3>9.3 Outcome Metrics</h3>
+        <table>
+            <tr><th>Metric</th><th>Target</th><th>Measurement</th></tr>
+            <tr><td>Time to identify a lagging village</td><td>≤ 30 seconds from page load</td><td>Usability testing, timed task</td></tr>
+            <tr><td>Report preparation time reduction</td><td>50% reduction</td><td>Pre/post user interviews + time tracking</td></tr>
+            <tr><td>Planning cycle completion acceleration</td><td>15% more villages complete Phase 4 within 6 months of launch</td><td>Compare completion rates before/after launch</td></tr>
+            <tr><td>Funding equity improvement</td><td>Reduction in per-capita investment variance across villages</td><td>Standard deviation of per-capita invested, measured quarterly</td></tr>
+        </table>
+
+        <h3>9.4 Technical Quality Metrics</h3>
+        <table>
+            <tr><th>Metric</th><th>Target</th><th>Measurement</th></tr>
+            <tr><td>Page load time (Canton/Commune)</td><td>≤ 3 seconds on 3G connection</td><td>Lighthouse performance audit</td></tr>
+            <tr><td>Map initialization time</td><td>≤ 2 seconds after tab click</td><td>Performance instrumentation</td></tr>
+            <tr><td>Gallery filter response time</td><td>≤ 1 second to re-render grid</td><td>API response time + render measurement</td></tr>
+            <tr><td>Mobile responsiveness</td><td>All critical features usable on 375px viewport</td><td>Manual QA on mobile devices</td></tr>
+        </table>
+
+        <!-- Footer -->
+        <div style="margin-top: 64px; padding-top: 24px; border-top: 2px solid var(--gray-200); color: var(--gray-500); font-size: 12px;">
+            <p>COSOMIS — Local Development Planning Platform · Benin CDD Program · World Bank</p>
+            <p>Document generated March 2026. Prototypes are interactive HTML files — open them in any modern browser.</p>
+        </div>
+
+    </main>
+</div>
+
+<!-- Scroll spy: highlight sidebar link on scroll -->
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+    const links = document.querySelectorAll('.sidebar a[href^="#"]');
+    const sections = [];
+    links.forEach(function(link){
+        const id = link.getAttribute('href').slice(1);
+        const el = document.getElementById(id);
+        if(el) sections.push({ id: id, el: el, link: link });
+    });
+    function onScroll(){
+        const scrollPos = window.scrollY + 100;
+        let current = sections[0];
+        sections.forEach(function(s){
+            if(s.el.offsetTop <= scrollPos) current = s;
+        });
+        links.forEach(function(l){ l.classList.remove('active'); });
+        if(current) current.link.classList.add('active');
+    }
+    window.addEventListener('scroll', onScroll);
+    onScroll();
+});
+</script>
+</body>
+</html>
