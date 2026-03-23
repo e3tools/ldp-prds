@@ -122,6 +122,8 @@
         .map-sidebar { max-height: 500px; overflow-y: auto; }
         .map-sidebar .list-group-item { cursor: pointer; font-size: 12px; padding: 8px 12px; }
         .map-sidebar .list-group-item:hover { background: #eaf4fd; }
+        .map-controls { margin-bottom: 12px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .map-controls .btn.active { background: #3498db; color: #fff; }
         .map-sidebar .list-group-item.active { background: #3498db; color: #fff; border-color: #3498db; }
     </style>
 </head>
@@ -407,6 +409,12 @@
 
                                         <!-- ═══ TAB: Map ══════════════════════ -->
                                         <div id="map_tab" class="tab-pane fade">
+                                            <!-- Map layer controls -->
+                                            <div class="map-controls">
+                                                <button class="btn btn-sm btn-outline-primary active" id="btn-layer-priorities" onclick="toggleLayer('priorities')"><i class="fa fa-flag mr-1"></i> Priorities</button>
+                                                <button class="btn btn-sm btn-outline-primary" id="btn-layer-subprojects" onclick="toggleLayer('subprojects')"><i class="fa fa-project-diagram mr-1"></i> Subprojects</button>
+                                                <button class="btn btn-sm btn-outline-primary" id="btn-layer-progress" onclick="toggleLayer('progress')"><i class="fa fa-tasks mr-1"></i> Planning Progress</button>
+                                            </div>
                                             <div class="row">
                                                 <!-- Map -->
                                                 <div class="col-md-8 col-12">
@@ -418,26 +426,26 @@
                                                 <div class="col-md-4 col-12">
                                                     <div class="card">
                                                         <div class="card-header pb-0"><h5 class="font-weight-bold mb-0">Subprojects &amp; Priorities</h5></div>
-                                                        <div class="card-body p-2 map-sidebar">
-                                                            <div class="mb-2"><small class="text-muted">Click a marker or item to see details</small></div>
+                                                        <div class="card-body p-0 map-sidebar">
+                                                            <div class="mb-2 px-2 pt-2"><small class="text-muted">Click a marker or item to see details</small></div>
                                                             <div class="list-group" id="mapSidebar">
-                                                                <a href="#" class="list-group-item list-group-item-action" data-village="tourou-centre">
+                                                                <a href="#" class="list-group-item list-group-item-action" data-village="tourou-centre" style="border-left: 3px solid #f39c12;">
                                                                     <div class="d-flex justify-content-between"><strong>Tourou-Centre</strong> <span class="badge badge-warning">Education</span></div>
                                                                     <small>Construction of primary school — 45M FCFA</small>
                                                                 </a>
-                                                                <a href="#" class="list-group-item list-group-item-action" data-village="sounon">
+                                                                <a href="#" class="list-group-item list-group-item-action" data-village="sounon" style="border-left: 3px solid #17a2b8;">
                                                                     <div class="d-flex justify-content-between"><strong>Sounon</strong> <span class="badge badge-info">Water</span></div>
                                                                     <small>Drilling of boreholes (3 units) — 28.5M FCFA</small>
                                                                 </a>
-                                                                <a href="#" class="list-group-item list-group-item-action" data-village="gbegourou">
+                                                                <a href="#" class="list-group-item list-group-item-action" data-village="gbegourou" style="border-left: 3px solid #28a745;">
                                                                     <div class="d-flex justify-content-between"><strong>Gbégourou</strong> <span class="badge badge-success">Health</span></div>
                                                                     <small>Rehabilitation of health center — 32M FCFA</small>
                                                                 </a>
-                                                                <a href="#" class="list-group-item list-group-item-action" data-village="yankerou">
+                                                                <a href="#" class="list-group-item list-group-item-action" data-village="yankerou" style="border-left: 3px solid #3498db;">
                                                                     <div class="d-flex justify-content-between"><strong>Yankérou</strong> <span class="badge badge-primary">Agriculture</span></div>
                                                                     <small>Irrigation infrastructure — 55M FCFA</small>
                                                                 </a>
-                                                                <a href="#" class="list-group-item list-group-item-action" data-village="kpebouko">
+                                                                <a href="#" class="list-group-item list-group-item-action" data-village="kpebouko" style="border-left: 3px solid #6c757d;">
                                                                     <div class="d-flex justify-content-between"><strong>Kpébouko</strong> <span class="badge badge-secondary">Transport</span></div>
                                                                     <small>Rural road rehabilitation — 84.5M FCFA</small>
                                                                 </a>

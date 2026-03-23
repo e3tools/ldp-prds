@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gallery Prototype — Benin LDP</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* ===== RESET & BASE ===== */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --primary-light: #dbeafe;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --radius: 10px;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.06);
+            --shadow-lg: 0 10px 15px rgba(0,0,0,0.1), 0 4px 6px rgba(0,0,0,0.05);
+            --sidebar-width: 280px;
+            --topbar-height: 56px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--gray-50);
+            color: var(--gray-800);
+            line-height: 1.5;
+        }
+
+        /* ===== LAYOUT ===== */
+        .app-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ===== LEFT SIDEBAR (nav — stays as-is from original) ===== */
+        .nav-sidebar {
+            width: 60px;
+            background: var(--gray-900);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 16px 0;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+        .nav-sidebar .nav-icon {
+            width: 40px; height: 40px;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--gray-400);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-size: 16px;
+        }
+        .nav-sidebar .nav-icon:hover { background: var(--gray-700); color: white; }
+        .nav-sidebar .nav-icon.active { background: var(--primary); color: white; }
+        .nav-sidebar .nav-logo {
+            width: 36px; height: 36px;
+            background: var(--primary);
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: 700; font-size: 14px;
+            margin-bottom: 16px;
+        }
+
+        /* ===== MAIN AREA ===== */
+        .main-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        /* ===== TOP BAR ===== */
+        .topbar {
+            height: var(--topbar-height);
+            background: white;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            gap: 16px;
+            flex-shrink: 0;
+        }
+        .topbar h1 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+        .topbar .breadcrumb {
+            font-size: 13px;
+            color: var(--gray-400);
+        }
+        .topbar .breadcrumb a { color: var(--gray-500); text-decoration: none; }
+        .topbar .breadcrumb a:hover { color: var(--primary); }
+
+        .topbar-actions {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* ===== IMPROVEMENT #2 & #7: SORT + VISIBLE FILTER BUTTON ===== */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid var(--gray-200);
+            background: white;
+            color: var(--gray-700);
+            transition: all 0.15s;
+            white-space: nowrap;
+        }
+        .btn:hover { border-color: var(--gray-300); background: var(--gray-50); }
+        .btn-primary { background: var(--primary); color: white; border-color: var(--primary); }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn i { font-size: 13px; }
+
+        .btn .filter-badge {
+            background: var(--primary);
+            color: white;
+            font-size: 10px;
+            width: 18px; height: 18px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700;
+        }
+
+        .sort-select {
+            padding: 7px 30px 7px 10px;
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+            font-size: 13px;
+            color: var(--gray-700);
+            background: white;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%236b7280' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+        }
+
+        /* ===== CONTENT WITH FILTER SIDEBAR ===== */
+        .content-wrapper {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* ===== IMPROVEMENT #3: SIDEBAR FILTERS INSTEAD OF MODAL ===== */
+        .filter-sidebar {
+            width: var(--sidebar-width);
+            background: white;
+            border-right: 1px solid var(--gray-200);
+            flex-shrink: 0;
+            overflow-y: auto;
+            transition: margin-left 0.25s ease;
+        }
+        .filter-sidebar.collapsed {
+            margin-left: calc(-1 * var(--sidebar-width));
+        }
+
+        .filter-section {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--gray-100);
+        }
+        .filter-section-title {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--gray-400);
+            margin-bottom: 10px;
+        }
+
+        /* Type radio pills */
+        .type-pills {
+            display: flex;
+            gap: 6px;
+        }
+        .type-pill {
+            flex: 1;
+            text-align: center;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid var(--gray-200);
+            background: white;
+            color: var(--gray-600);
+            transition: all 0.15s;
+        }
+        .type-pill:hover { border-color: var(--primary); color: var(--primary); }
+        .type-pill.active {
+            background: var(--primary-light);
+            border-color: var(--primary);
+            color: var(--primary-dark);
+        }
+        .type-pill input { display: none; }
+
+        /* ===== IMPROVEMENT #4: VILLAGE SEARCH AUTOCOMPLETE ===== */
+        .filter-field { margin-bottom: 12px; }
+        .filter-field label {
+            display: block;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--gray-600);
+            margin-bottom: 4px;
+        }
+        .filter-field select,
+        .filter-field input[type="text"] {
+            width: 100%;
+            padding: 7px 10px;
+            border: 1px solid var(--gray-200);
+            border-radius: 6px;
+            font-size: 13px;
+            color: var(--gray-700);
+            background: white;
+            transition: border-color 0.15s;
+        }
+        .filter-field select:focus,
+        .filter-field input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+        }
+        .filter-field select:disabled {
+            background: var(--gray-50);
+            color: var(--gray-400);
+        }
+        .search-input-wrap {
+            position: relative;
+        }
+        .search-input-wrap i {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-400);
+            font-size: 12px;
+        }
+        .search-input-wrap input {
+            padding-left: 30px !important;
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 8px;
+            padding: 16px 20px;
+        }
+        .filter-actions .btn { flex: 1; justify-content: center; }
+
+        /* ===== IMPROVEMENT #5: ACTIVE FILTER CHIPS ===== */
+        .active-filters {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 24px;
+            background: white;
+            border-bottom: 1px solid var(--gray-100);
+            flex-wrap: wrap;
+            min-height: 0;
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+        .active-filters:empty, .active-filters.hidden {
+            padding: 0;
+            min-height: 0;
+            border: none;
+        }
+        .filter-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .filter-chip .chip-remove {
+            cursor: pointer;
+            width: 16px; height: 16px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 50%;
+            font-size: 10px;
+            transition: background 0.15s;
+        }
+        .filter-chip .chip-remove:hover {
+            background: rgba(37, 99, 235, 0.2);
+        }
+        .clear-all {
+            font-size: 12px;
+            color: var(--gray-500);
+            cursor: pointer;
+            margin-left: 4px;
+        }
+        .clear-all:hover { color: var(--primary); text-decoration: underline; }
+
+        /* ===== GALLERY GRID ===== */
+        .gallery-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 24px;
+        }
+
+        .gallery-stats {
+            font-size: 13px;
+            color: var(--gray-500);
+            margin-bottom: 16px;
+        }
+        .gallery-stats strong { color: var(--gray-700); }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        /* ===== IMPROVEMENT #8 & #9: IMAGE ON TOP, TRUNCATED METADATA ===== */
+        .gallery-card {
+            background: white;
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-200);
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+        .gallery-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        /* IMPROVEMENT #12: Visible checkbox for bulk select */
+        .gallery-card .card-check {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 2;
+            width: 22px; height: 22px;
+            border-radius: 6px;
+            border: 2px solid rgba(255,255,255,0.8);
+            background: rgba(0,0,0,0.2);
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.15s;
+            opacity: 0;
+        }
+        .gallery-card:hover .card-check,
+        .gallery-card .card-check.checked {
+            opacity: 1;
+        }
+        .gallery-card .card-check.checked {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+        .gallery-card .card-check.checked::after {
+            content: '\f00c';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            font-size: 11px;
+            color: white;
+        }
+
+        /* Image area — hero on top */
+        .card-image-wrap {
+            position: relative;
+            width: 100%;
+            padding-top: 66%;
+            background: var(--gray-100);
+            overflow: hidden;
+        }
+        .card-image-wrap img {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+        .gallery-card:hover .card-image-wrap img {
+            transform: scale(1.03);
+        }
+
+        /* IMPROVEMENT #11: Skeleton placeholder while loading */
+        .card-image-wrap .skeleton {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, var(--gray-100) 25%, var(--gray-200) 50%, var(--gray-100) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* Document card variant */
+        .card-image-wrap.doc-type {
+            padding-top: 50%;
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .card-image-wrap.doc-type .doc-icon {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 40px;
+            color: var(--warning);
+        }
+
+        /* Metadata below image — compact */
+        .card-meta {
+            padding: 12px 14px;
+        }
+        .card-meta .card-location {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: var(--gray-500);
+            margin-bottom: 4px;
+        }
+        .card-meta .card-location i { font-size: 10px; }
+        .card-meta .card-location a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .card-meta .card-location a:hover { text-decoration: underline; }
+        .card-meta .card-task {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--gray-800);
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .card-meta .card-desc {
+            font-size: 12px;
+            color: var(--gray-500);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .card-meta .card-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-weight: 500;
+            margin-top: 6px;
+        }
+        .card-badge.status-done { background: #d1fae5; color: #065f46; }
+        .card-badge.status-progress { background: #dbeafe; color: #1e40af; }
+        .card-badge.status-todo { background: var(--gray-100); color: var(--gray-600); }
+        .card-meta .card-date {
+            font-size: 11px;
+            color: var(--gray-400);
+            margin-top: 4px;
+        }
+
+        /* ===== IMPROVEMENT #13: INFINITE SCROLL LOADING INDICATOR ===== */
+        .load-more-indicator {
+            text-align: center;
+            padding: 32px 0;
+            color: var(--gray-400);
+            font-size: 13px;
+        }
+        .load-more-indicator .spinner {
+            display: inline-block;
+            width: 20px; height: 20px;
+            border: 2px solid var(--gray-200);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ===== IMPROVEMENT #6: EMPTY STATE ===== */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+        }
+        .empty-state i {
+            font-size: 48px;
+            color: var(--gray-300);
+            margin-bottom: 16px;
+        }
+        .empty-state h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--gray-700);
+            margin-bottom: 6px;
+        }
+        .empty-state p {
+            font-size: 13px;
+            color: var(--gray-500);
+            margin-bottom: 20px;
+            max-width: 320px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* ===== IMPROVEMENT #10 & #14: LIGHTBOX OVERLAY ===== */
+        .lightbox-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.92);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s;
+        }
+        .lightbox-overlay.open {
+            opacity: 1;
+            pointer-events: all;
+        }
+        .lightbox-close {
+            position: absolute;
+            top: 16px; right: 20px;
+            width: 40px; height: 40px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.15s;
+        }
+        .lightbox-close:hover { background: rgba(255,255,255,0.2); }
+
+        .lightbox-content {
+            max-width: 85vw;
+            max-height: 80vh;
+            position: relative;
+        }
+        .lightbox-content img {
+            max-width: 85vw;
+            max-height: 80vh;
+            object-fit: contain;
+            border-radius: 4px;
+        }
+        .lightbox-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 44px; height: 44px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.15s;
+        }
+        .lightbox-nav:hover { background: rgba(255,255,255,0.25); }
+        .lightbox-nav.prev { left: -60px; }
+        .lightbox-nav.next { right: -60px; }
+
+        .lightbox-info {
+            position: absolute;
+            bottom: -48px;
+            left: 0; right: 0;
+            text-align: center;
+            color: rgba(255,255,255,0.7);
+            font-size: 13px;
+        }
+        .lightbox-info strong { color: white; }
+        .lightbox-counter {
+            position: absolute;
+            top: 20px; left: 24px;
+            color: rgba(255,255,255,0.6);
+            font-size: 13px;
+        }
+        .lightbox-download {
+            position: absolute;
+            top: 16px; right: 70px;
+            width: 40px; height: 40px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.15s;
+        }
+        .lightbox-download:hover { background: rgba(255,255,255,0.2); }
+
+        /* ===== BULK ACTION BAR ===== */
+        .bulk-bar {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            background: var(--gray-900);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            transition: transform 0.3s ease;
+            z-index: 100;
+            font-size: 13px;
+        }
+        .bulk-bar.visible {
+            transform: translateX(-50%) translateY(0);
+        }
+        .bulk-bar .bulk-count { font-weight: 600; }
+        .bulk-bar .btn {
+            border-color: rgba(255,255,255,0.2);
+            color: white;
+            font-size: 12px;
+            padding: 5px 12px;
+        }
+        .bulk-bar .btn:hover { background: rgba(255,255,255,0.1); }
+        .bulk-bar .btn-primary { background: var(--primary); border-color: var(--primary); }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .filter-sidebar { position: fixed; left: 0; top: 0; bottom: 0; z-index: 200; width: 280px; }
+            .filter-sidebar.collapsed { margin-left: 0; transform: translateX(-100%); }
+            .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+            .lightbox-nav.prev { left: 8px; }
+            .lightbox-nav.next { right: 8px; }
+        }
+
+        /* ===== ANNOTATION LABELS ===== */
+        .ux-label {
+            position: absolute;
+            z-index: 50;
+            background: #ef4444;
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 4px;
+            white-space: nowrap;
+            pointer-events: none;
+            letter-spacing: 0.03em;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== LIGHTBOX ===== -->
+<div class="lightbox-overlay" id="lightbox">
+    <span class="lightbox-counter" id="lb-counter">3 / 12</span>
+    <button class="lightbox-download" title="Download"><i class="fa-solid fa-download"></i></button>
+    <button class="lightbox-close" id="lb-close"><i class="fa-solid fa-xmark"></i></button>
+    <div class="lightbox-content">
+        <button class="lightbox-nav prev" id="lb-prev"><i class="fa-solid fa-chevron-left"></i></button>
+        <img id="lb-img" src="" alt="">
+        <button class="lightbox-nav next" id="lb-next"><i class="fa-solid fa-chevron-right"></i></button>
+        <div class="lightbox-info">
+            <strong id="lb-title"></strong><br>
+            <span id="lb-location"></span>
+        </div>
+    </div>
+</div>
+
+<!-- ===== APP LAYOUT ===== -->
+<div class="app-layout">
+
+    <!-- Minimal nav sidebar (represents existing sidebar) -->
+    <nav class="nav-sidebar">
+        <div class="nav-logo">LDP</div>
+        <div class="nav-icon" title="Dashboard"><i class="fa-solid fa-house"></i></div>
+        <div class="nav-icon" title="Investments"><i class="fa-solid fa-chart-bar"></i></div>
+        <div class="nav-icon active" title="Gallery"><i class="fa-solid fa-images"></i></div>
+        <div class="nav-icon" title="Map"><i class="fa-solid fa-map"></i></div>
+        <div class="nav-icon" title="Settings"><i class="fa-solid fa-gear"></i></div>
+    </nav>
+
+    <!-- Main area -->
+    <div class="main-area">
+
+        <!-- Top bar -->
+        <div class="topbar">
+            <span class="breadcrumb"><a href="#">Home</a> / </span>
+            <h1><i class="fa-solid fa-images" style="color:var(--primary);margin-right:6px;font-size:16px"></i> Gallery</h1>
+            <div class="topbar-actions">
+                <!-- IMPROVEMENT #7: Sort dropdown -->
+                <select class="sort-select" id="sortSelect">
+                    <option value="newest">Newest first</option>
+                    <option value="oldest">Oldest first</option>
+                    <option value="location">By location</option>
+                </select>
+                <!-- IMPROVEMENT #2: Visible, labeled filter button with badge -->
+                <button class="btn" id="toggleFilter">
+                    <i class="fa-solid fa-sliders"></i>
+                    Filters
+                    <span class="filter-badge" id="filterBadge">3</span>
+                </button>
+                <button class="btn btn-primary" id="downloadSelected" style="display:none">
+                    <i class="fa-solid fa-download"></i> Download
+                </button>
+            </div>
+        </div>
+
+        <!-- IMPROVEMENT #5: Active filter chips -->
+        <div class="active-filters" id="activeFilters">
+            <span class="filter-chip">
+                Type: Photos
+                <span class="chip-remove" data-filter="type"><i class="fa-solid fa-xmark"></i></span>
+            </span>
+            <span class="filter-chip">
+                Commune: Abomey-Calavi
+                <span class="chip-remove" data-filter="commune"><i class="fa-solid fa-xmark"></i></span>
+            </span>
+            <span class="filter-chip">
+                Phase: Phase 2
+                <span class="chip-remove" data-filter="phase"><i class="fa-solid fa-xmark"></i></span>
+            </span>
+            <span class="clear-all" id="clearAllFilters">Clear all</span>
+        </div>
+
+        <div class="content-wrapper">
+
+            <!-- IMPROVEMENT #3: Sidebar filters instead of modal -->
+            <aside class="filter-sidebar" id="filterSidebar">
+                <div class="filter-section">
+                    <div class="filter-section-title">Attachment Type</div>
+                    <div class="type-pills">
+                        <label class="type-pill active" data-value="Photo">
+                            <input type="radio" name="type" value="Photo" checked> Photos
+                        </label>
+                        <label class="type-pill" data-value="Document">
+                            <input type="radio" name="type" value="Document"> Docs
+                        </label>
+                        <label class="type-pill" data-value="">
+                            <input type="radio" name="type" value=""> Both
+                        </label>
+                    </div>
+                </div>
+
+                <div class="filter-section">
+                    <div class="filter-section-title">Location</div>
+
+                    <!-- IMPROVEMENT #4: Quick search for village -->
+                    <div class="filter-field">
+                        <label>Quick search</label>
+                        <div class="search-input-wrap">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input type="text" placeholder="Search village name..." id="villageSearch">
+                        </div>
+                    </div>
+
+                    <div class="filter-field">
+                        <label>Department</label>
+                        <select id="filterDept">
+                            <option value="">All departments</option>
+                            <option value="1">Atlantique</option>
+                            <option value="2">Littoral</option>
+                            <option value="3">Ouémé</option>
+                            <option value="4">Zou</option>
+                        </select>
+                    </div>
+                    <div class="filter-field">
+                        <label>Commune</label>
+                        <select id="filterCommune">
+                            <option value="">All communes</option>
+                            <option value="1" selected>Abomey-Calavi</option>
+                            <option value="2">Cotonou</option>
+                            <option value="3">Ouidah</option>
+                        </select>
+                    </div>
+                    <div class="filter-field">
+                        <label>City</label>
+                        <select id="filterCity">
+                            <option value="">All cities</option>
+                        </select>
+                    </div>
+                    <div class="filter-field">
+                        <label>Village</label>
+                        <select id="filterVillage">
+                            <option value="">All villages</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="filter-section">
+                    <div class="filter-section-title">Activity</div>
+                    <div class="filter-field">
+                        <label>Phase</label>
+                        <select id="filterPhase">
+                            <option value="">All phases</option>
+                            <option value="1">Phase 1 - Preparation</option>
+                            <option value="2" selected>Phase 2 - Implementation</option>
+                            <option value="3">Phase 3 - Evaluation</option>
+                        </select>
+                    </div>
+                    <div class="filter-field">
+                        <label>Activity</label>
+                        <select id="filterActivity">
+                            <option value="">All activities</option>
+                        </select>
+                    </div>
+                    <div class="filter-field">
+                        <label>Task</label>
+                        <select id="filterTask">
+                            <option value="">All tasks</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="filter-actions">
+                    <button class="btn" id="resetFilters">Reset</button>
+                    <button class="btn btn-primary" id="applyFilters">Apply</button>
+                </div>
+            </aside>
+
+            <!-- Gallery content -->
+            <div class="gallery-scroll" id="galleryScroll">
+                <div class="gallery-stats">
+                    Showing <strong id="countDisplay">12</strong> photos in <strong>Abomey-Calavi</strong> &middot; Phase 2
+                </div>
+
+                <div class="gallery-grid" id="galleryGrid">
+                    <!-- Cards are injected by JS below -->
+                </div>
+
+                <!-- IMPROVEMENT #13: Loading indicator -->
+                <div class="load-more-indicator" id="loadMore">
+                    <span class="spinner"></span> Loading more photos...
+                </div>
+
+                <!-- IMPROVEMENT #6: Empty state (hidden by default) -->
+                <div class="empty-state" id="emptyState" style="display:none">
+                    <i class="fa-regular fa-image"></i>
+                    <h3>No photos found</h3>
+                    <p>Try broadening your filters or selecting a different area to see results.</p>
+                    <button class="btn btn-primary" id="emptyReset"><i class="fa-solid fa-rotate-left"></i> Clear filters</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- IMPROVEMENT #12: Bulk action bar -->
+<div class="bulk-bar" id="bulkBar">
+    <span><span class="bulk-count" id="bulkCount">0</span> selected</span>
+    <button class="btn btn-primary"><i class="fa-solid fa-download"></i> Download ZIP</button>
+    <button class="btn" id="bulkDeselect"><i class="fa-solid fa-xmark"></i> Deselect</button>
+</div>
+
+<script>
+// ===== DEMO DATA =====
+const SAMPLE_IMAGES = [
+    // Community / village meetings
+    'https://images.unsplash.com/photo-1531206715517-5c0ba140b2b8?w=600&q=80',  // community gathering outdoors
+    'https://images.unsplash.com/photo-1577896851231-70ef18881754?w=600&q=80',  // classroom / training session
+    'https://images.unsplash.com/photo-1529390079861-591de354faf5?w=600&q=80',  // group discussion
+    'https://images.unsplash.com/photo-1509099652299-30938b0aeb63?w=600&q=80',  // community outdoor meeting
+    'https://images.unsplash.com/photo-1541339907238-5cc2249d6c42?w=600&q=80',  // people working together
+    // Rural construction / infrastructure projects
+    'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=600&q=80',  // construction site
+    'https://images.unsplash.com/photo-1572981779307-38b8cabb2407?w=600&q=80',  // building under construction
+    'https://images.unsplash.com/photo-1590069261209-f8e9b8642343?w=600&q=80',  // rural road / infrastructure
+    'https://images.unsplash.com/photo-1581094288338-2314dddb7ece?w=600&q=80',  // workers at a site
+    'https://images.unsplash.com/photo-1597484661643-2f5fef640dd1?w=600&q=80',  // water well / pump project
+    // Agriculture / rural development
+    'https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=600&q=80',  // farming / agricultural project
+    'https://images.unsplash.com/photo-1594708767771-a7502209ff7e?w=600&q=80',  // solar panels / rural energy
+];
+
+const VILLAGES = ['Godomey', 'Togba', 'Hêvié', 'Kpanroun', 'Zinvié', 'Ouèdo', 'Akassato'];
+const TASKS = [
+    'Village assembly — subproject prioritization', 'Participatory monitoring training session', 'Water point borehole drilling',
+    'School block construction — Phase 2', 'Rural feeder road rehabilitation', 'Community health center inspection',
+    'Farmer field school — rice cultivation', 'Culvert and bridge construction', 'Market shed roofing progress',
+    'Community-led total sanitation meeting', 'Solar-powered pump installation', 'Youth skills center foundation laying'
+];
+const DESCS = [
+    'Village general assembly for CDD subproject selection and community contribution planning.',
+    'Training of community monitors on participatory M&E tools and data collection methods.',
+    'Borehole drilling and hand pump installation to serve 3 neighboring villages.',
+    'Two-classroom block with latrines — walls complete, awaiting roofing materials.',
+    'Grading and laterite compaction of 4.2 km feeder road connecting Togba to the national route.',
+    'Joint inspection by CVD and commune authorities of the newly built health center.',
+    'Hands-on demonstration of improved rice varieties and SRI techniques for local farmers.',
+    'Reinforced concrete culvert to replace the seasonal wood crossing at the river.',
+    'Steel frame and corrugated roofing for the expanded weekly market facility.',
+    'CLTS triggering session — community action plan for achieving open-defecation-free status.',
+    'Solar-powered submersible pump connected to 5 standpipes for year-round water supply.',
+    'Foundation and ground floor slab for the youth vocational training center.'
+];
+const STATUSES = ['Completed', 'In progress', 'To do'];
+const STATUS_CLASS = { 'Completed': 'status-done', 'In progress': 'status-progress', 'To do': 'status-todo' };
+const DATES = [
+    'Mar 20, 2026', 'Mar 18, 2026', 'Mar 15, 2026', 'Mar 12, 2026',
+    'Mar 10, 2026', 'Mar 8, 2026', 'Mar 5, 2026', 'Mar 1, 2026',
+    'Feb 25, 2026', 'Feb 20, 2026', 'Feb 15, 2026', 'Feb 10, 2026'
+];
+
+const attachments = SAMPLE_IMAGES.map((url, i) => ({
+    id: i,
+    url,
+    village: VILLAGES[i % VILLAGES.length],
+    task: TASKS[i],
+    status: STATUSES[i % 3],
+    date: DATES[i],
+    type: i === 4 ? 'Document' : 'Photo',
+    desc: DESCS[i % DESCS.length]
+}));
+
+// ===== RENDER GALLERY =====
+const grid = document.getElementById('galleryGrid');
+
+function renderCards(items) {
+    grid.innerHTML = '';
+    items.forEach((att, idx) => {
+        const isDoc = att.type === 'Document';
+        const card = document.createElement('div');
+        card.className = 'gallery-card';
+        card.dataset.index = idx;
+        card.innerHTML = `
+            <div class="card-check" data-id="${att.id}"></div>
+            <div class="card-image-wrap${isDoc ? ' doc-type' : ''}">
+                ${isDoc
+                    ? `<i class="fa-solid fa-file-pdf doc-icon"></i>`
+                    : `<div class="skeleton" id="skel-${att.id}"></div>
+                       <img src="${att.url}" alt="${att.task}" loading="lazy" onload="document.getElementById('skel-${att.id}').style.display='none'">`
+                }
+            </div>
+            <div class="card-meta">
+                <div class="card-location">
+                    <i class="fa-solid fa-location-dot"></i>
+                    <a href="#">Village: ${att.village}</a>
+                </div>
+                <div class="card-task">${att.task}</div>
+                <div class="card-desc">${att.desc}</div>
+                <span class="card-badge ${STATUS_CLASS[att.status]}">
+                    <i class="fa-solid fa-circle" style="font-size:6px"></i> ${att.status}
+                </span>
+                <div class="card-date"><i class="fa-regular fa-clock"></i> ${att.date}</div>
+            </div>
+        `;
+        grid.appendChild(card);
+    });
+}
+
+renderCards(attachments);
+document.getElementById('countDisplay').textContent = attachments.length;
+
+// ===== LIGHTBOX =====
+const lightbox = document.getElementById('lightbox');
+const lbImg = document.getElementById('lb-img');
+const lbTitle = document.getElementById('lb-title');
+const lbLocation = document.getElementById('lb-location');
+const lbCounter = document.getElementById('lb-counter');
+let currentLB = 0;
+const photoItems = attachments.filter(a => a.type === 'Photo');
+
+function openLightbox(index) {
+    currentLB = index;
+    updateLightbox();
+    lightbox.classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+function closeLightbox() {
+    lightbox.classList.remove('open');
+    document.body.style.overflow = '';
+}
+function updateLightbox() {
+    const item = photoItems[currentLB];
+    if (!item) return;
+    lbImg.src = item.url;
+    lbTitle.textContent = item.task;
+    lbLocation.textContent = 'Village: ' + item.village + ' — ' + item.date;
+    lbCounter.textContent = (currentLB + 1) + ' / ' + photoItems.length;
+}
+
+document.getElementById('lb-close').onclick = closeLightbox;
+document.getElementById('lb-prev').onclick = () => { currentLB = (currentLB - 1 + photoItems.length) % photoItems.length; updateLightbox(); };
+document.getElementById('lb-next').onclick = () => { currentLB = (currentLB + 1) % photoItems.length; updateLightbox(); };
+lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
+document.addEventListener('keydown', e => {
+    if (!lightbox.classList.contains('open')) return;
+    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowLeft') { currentLB = (currentLB - 1 + photoItems.length) % photoItems.length; updateLightbox(); }
+    if (e.key === 'ArrowRight') { currentLB = (currentLB + 1) % photoItems.length; updateLightbox(); }
+});
+
+// Click card to open lightbox (not a new tab)
+grid.addEventListener('click', e => {
+    const card = e.target.closest('.gallery-card');
+    if (!card) return;
+    const check = e.target.closest('.card-check');
+    if (check) return; // checkbox click handled separately
+    const idx = parseInt(card.dataset.index);
+    const att = attachments[idx];
+    if (att.type !== 'Photo') return;
+    const photoIdx = photoItems.findIndex(p => p.id === att.id);
+    openLightbox(photoIdx);
+});
+
+// ===== CHECKBOX / BULK SELECT =====
+const bulkBar = document.getElementById('bulkBar');
+const bulkCount = document.getElementById('bulkCount');
+let selected = new Set();
+
+grid.addEventListener('click', e => {
+    const check = e.target.closest('.card-check');
+    if (!check) return;
+    e.stopPropagation();
+    const id = parseInt(check.dataset.id);
+    if (selected.has(id)) { selected.delete(id); check.classList.remove('checked'); }
+    else { selected.add(id); check.classList.add('checked'); }
+    bulkCount.textContent = selected.size;
+    bulkBar.classList.toggle('visible', selected.size > 0);
+});
+
+document.getElementById('bulkDeselect').onclick = () => {
+    selected.clear();
+    document.querySelectorAll('.card-check').forEach(c => c.classList.remove('checked'));
+    bulkBar.classList.remove('visible');
+};
+
+// ===== TOGGLE FILTER SIDEBAR =====
+const sidebar = document.getElementById('filterSidebar');
+document.getElementById('toggleFilter').onclick = () => {
+    sidebar.classList.toggle('collapsed');
+};
+
+// ===== TYPE PILLS =====
+document.querySelectorAll('.type-pill').forEach(pill => {
+    pill.onclick = () => {
+        document.querySelectorAll('.type-pill').forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+    };
+});
+
+// ===== FILTER CHIPS =====
+document.querySelectorAll('.chip-remove').forEach(chip => {
+    chip.onclick = () => chip.parentElement.remove();
+});
+document.getElementById('clearAllFilters').onclick = () => {
+    document.getElementById('activeFilters').innerHTML = '';
+};
+
+// ===== EMPTY STATE DEMO =====
+document.getElementById('resetFilters').onclick = () => {
+    // Demo: toggle empty state
+    grid.style.display = 'none';
+    document.getElementById('loadMore').style.display = 'none';
+    document.querySelector('.gallery-stats').style.display = 'none';
+    document.getElementById('emptyState').style.display = 'block';
+};
+document.getElementById('emptyReset').onclick = () => {
+    grid.style.display = '';
+    document.getElementById('loadMore').style.display = '';
+    document.querySelector('.gallery-stats').style.display = '';
+    document.getElementById('emptyState').style.display = 'none';
+};
+
+// ===== SORT DEMO =====
+document.getElementById('sortSelect').onchange = function() {
+    const sorted = [...attachments];
+    if (this.value === 'oldest') sorted.reverse();
+    if (this.value === 'location') sorted.sort((a,b) => a.village.localeCompare(b.village));
+    renderCards(sorted);
+};
+</script>
+</body>
+</html>
