@@ -485,79 +485,123 @@ $(document).ready(function(){
     $('[data-toggle="tooltip"]').tooltip();
     $('.datatable').DataTable({ searching: false, pageLength: 10 });
 
-    // ── Leaflet Map ────────────────────────────────────────────
+});
+
+// ── Data ─────────────────────────────────────────────────────
+var sectorColors   = { 'Education':'#f39c12','Water':'#17a2b8','Health':'#28a745','Agriculture':'#3498db','Transport':'#6c757d' };
+var progressColors = { 'completed':'#28a745','inprogress':'#ffc107','notstarted':'#dc3545' };
+
+var villageData = [
+    { id:'tourou-centre', name:'Tourou-Centre', lat:9.355, lng:2.618, sector:'Education',  priority:'Construction of primary school',  cost:'45M',   funded:false, progress:'completed'  },
+    { id:'sounon',        name:'Sounon',        lat:9.340, lng:2.605, sector:'Water',       priority:'Drilling of boreholes (3 units)', cost:'28.5M', funded:false, progress:'inprogress' },
+    { id:'gbegourou',     name:'Gbégourou',     lat:9.365, lng:2.635, sector:'Health',      priority:'Rehabilitation of health center', cost:'32M',   funded:true,  progress:'completed'  },
+    { id:'yankerou',      name:'Yankérou',      lat:9.330, lng:2.640, sector:'Agriculture', priority:'Irrigation infrastructure',       cost:'55M',   funded:false, progress:'notstarted' },
+    { id:'kpebouko',      name:'Kpébouko',      lat:9.360, lng:2.600, sector:'Transport',   priority:'Rural road rehabilitation',       cost:'84.5M', funded:false, progress:'completed'  },
+    { id:'boko',          name:'Boko',          lat:9.338, lng:2.622, sector:'',            priority:'',                               cost:'',      funded:false, progress:'inprogress' },
+    { id:'wari',          name:'Wari',          lat:9.370, lng:2.645, sector:'',            priority:'',                               cost:'',      funded:false, progress:'completed'  },
+    { id:'dame',          name:'Damé',          lat:9.325, lng:2.650, sector:'',            priority:'',                               cost:'',      funded:false, progress:'notstarted' }
+];
+
+// ── Map ───────────────────────────────────────────────────────
+var cantonMap, mapMarkers = {}, currentLayer = 'priorities';
+var layerGroups = { priorities: null, subprojects: null, progress: null };
+
+function initCantonMap(){
+    cantonMap = L.map('cantonMap').setView([9.35, 2.62], 12);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors', maxZoom: 18
+    }).addTo(cantonMap);
+
+    layerGroups.priorities  = L.layerGroup();
+    layerGroups.subprojects = L.layerGroup();
+    layerGroups.progress    = L.layerGroup();
+
+    villageData.forEach(function(v){
+        var sColor = sectorColors[v.sector] || '#ccc';
+
+        // Priorities layer: colored by sector
+        var pm = L.circleMarker([v.lat, v.lng], { radius: v.sector ? 10 : 5, fillColor: sColor, color:'#fff', weight:2, fillOpacity:0.9 });
+        var popup = '<strong>' + v.name + '</strong>';
+        if(v.sector){
+            popup += '<br><span style="color:'+sColor+';">&#9679;</span> '+v.sector;
+            popup += '<br>'+v.priority+'<br><strong>'+v.cost+' FCFA</strong>';
+            popup += v.funded ? '<br><span style="color:#28a745">Funded</span>' : '<br><span style="color:#dc3545">Not Funded</span>';
+        }
+        pm.bindPopup(popup);
+        layerGroups.priorities.addLayer(pm);
+        mapMarkers[v.id] = pm;
+
+        // Subprojects layer: only villages with a subproject, larger ring style
+        if(v.sector){
+            var sm = L.circleMarker([v.lat, v.lng], { radius:13, fillColor:sColor, color:sColor, weight:3, fillOpacity:0.3 });
+            sm.bindPopup('<strong>'+v.name+'</strong><br>'+v.sector+'<br>'+v.priority+'<br><strong>'+v.cost+' FCFA</strong>');
+            layerGroups.subprojects.addLayer(sm);
+        }
+
+        // Progress layer: colored by planning status
+        var pColor = progressColors[v.progress];
+        var label  = v.progress === 'completed' ? 'Completed' : v.progress === 'inprogress' ? 'In Progress' : 'Not Started';
+        var prm = L.circleMarker([v.lat, v.lng], { radius:9, fillColor:pColor, color:'#fff', weight:2, fillOpacity:0.85 });
+        prm.bindPopup('<strong>'+v.name+'</strong><br>Status: <strong style="color:'+pColor+';">'+label+'</strong>');
+        layerGroups.progress.addLayer(prm);
+    });
+
+    // Default layer
+    layerGroups.priorities.addTo(cantonMap);
+
+    // Legend control
+    var legend = L.control({ position:'bottomright' });
+    legend.onAdd = function(){
+        var d = L.DomUtil.create('div','map-legend-box');
+        d.id = 'cantonMapLegend';
+        updateCantonLegend(d, 'priorities');
+        return d;
+    };
+    legend.addTo(cantonMap);
+}
+
+function updateCantonLegend(el, layer){
+    var html = '';
+    if(layer === 'priorities' || layer === 'subprojects'){
+        html = '<strong>Sectors</strong><br>';
+        for(var s in sectorColors) html += '<i style="background:'+sectorColors[s]+';"></i> '+s+'<br>';
+        if(layer === 'priorities') html += '<i style="background:#ccc;"></i> No priority<br>';
+    } else {
+        html = '<strong>Planning Status</strong><br>';
+        html += '<i style="background:#28a745;"></i> Completed<br>';
+        html += '<i style="background:#ffc107;"></i> In Progress<br>';
+        html += '<i style="background:#dc3545;"></i> Not Started<br>';
+    }
+    el.innerHTML = html;
+}
+
+function toggleLayer(name){
+    for(var k in layerGroups) cantonMap.removeLayer(layerGroups[k]);
+    layerGroups[name].addTo(cantonMap);
+    currentLayer = name;
+    $('.map-controls .btn').removeClass('active');
+    $('#btn-layer-' + name).addClass('active');
+    var leg = document.getElementById('cantonMapLegend');
+    if(leg) updateCantonLegend(leg, name);
+}
+
+$(document).ready(function(){
     var mapInitialized = false;
-
     $('a[data-toggle="tab"][href="#map_tab"]').on('shown.bs.tab', function(){
-        if (mapInitialized) return;
+        if(mapInitialized) return;
         mapInitialized = true;
+        initCantonMap();
+    });
 
-        var map = L.map('cantonMap').setView([9.35, 2.62], 12);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap contributors', maxZoom: 18
-        }).addTo(map);
-
-        // Sector color mapping
-        var sectorColors = {
-            'Education': '#f39c12', 'Water': '#17a2b8', 'Health': '#28a745',
-            'Agriculture': '#3498db', 'Transport': '#6c757d'
-        };
-
-        // Village data (would come from API in production)
-        var villages = [
-            { id:'tourou-centre', name:'Tourou-Centre', lat:9.355, lng:2.618, sector:'Education', priority:'Construction of primary school', cost:'45M', funded:false },
-            { id:'sounon',        name:'Sounon',        lat:9.340, lng:2.605, sector:'Water',     priority:'Drilling of boreholes', cost:'28.5M', funded:false },
-            { id:'gbegourou',     name:'Gbégourou',     lat:9.365, lng:2.635, sector:'Health',    priority:'Rehabilitation of health center', cost:'32M', funded:true },
-            { id:'yankerou',      name:'Yankérou',      lat:9.330, lng:2.640, sector:'Agriculture', priority:'Irrigation infrastructure', cost:'55M', funded:false },
-            { id:'kpebouko',      name:'Kpébouko',      lat:9.360, lng:2.600, sector:'Transport', priority:'Rural road rehabilitation', cost:'84.5M', funded:false },
-            { id:'boko',          name:'Boko',          lat:9.338, lng:2.622, sector:'', priority:'', cost:'', funded:false },
-            { id:'wari',          name:'Wari',          lat:9.370, lng:2.645, sector:'', priority:'', cost:'', funded:false },
-            { id:'dame',          name:'Damé',          lat:9.325, lng:2.650, sector:'', priority:'', cost:'', funded:false }
-        ];
-
-        var markers = {};
-        villages.forEach(function(v){
-            var color = sectorColors[v.sector] || '#999';
-            var radius = v.sector ? 10 : 6;
-            var marker = L.circleMarker([v.lat, v.lng], {
-                radius: radius, fillColor: color, color: '#fff', weight: 2,
-                fillOpacity: 0.9
-            }).addTo(map);
-
-            var popup = '<strong>' + v.name + '</strong>';
-            if (v.sector) {
-                popup += '<br><span style="color:' + color + ';">&#9679;</span> ' + v.sector;
-                popup += '<br>' + v.priority;
-                popup += '<br><strong>' + v.cost + ' FCFA</strong>';
-                popup += v.funded ? '<br><span class="text-success">Funded</span>' : '<br><span class="text-danger">Not Funded</span>';
-            }
-            marker.bindPopup(popup);
-            markers[v.id] = marker;
-        });
-
-        // Legend
-        var legend = L.control({ position: 'bottomright' });
-        legend.onAdd = function(){
-            var div = L.DomUtil.create('div', 'map-legend-box');
-            div.innerHTML = '<strong>Sectors</strong><br>';
-            for (var s in sectorColors) {
-                div.innerHTML += '<i style="background:' + sectorColors[s] + ';"></i> ' + s + '<br>';
-            }
-            div.innerHTML += '<i style="background:#999;"></i> No subproject<br>';
-            return div;
-        };
-        legend.addTo(map);
-
-        // Sidebar click → fly to marker
-        $('#mapSidebar .list-group-item').on('click', function(e){
-            e.preventDefault();
-            var vid = $(this).data('village');
-            if (markers[vid]) {
-                map.flyTo(markers[vid].getLatLng(), 14);
-                markers[vid].openPopup();
-            }
-            $(this).addClass('active').siblings().removeClass('active');
-        });
+    // Sidebar click → fly to marker
+    $('#mapSidebar .list-group-item').on('click', function(e){
+        e.preventDefault();
+        var vid = $(this).data('village');
+        if(mapMarkers[vid] && cantonMap){
+            cantonMap.flyTo(mapMarkers[vid].getLatLng(), 14);
+            mapMarkers[vid].openPopup();
+        }
+        $(this).addClass('active').siblings().removeClass('active');
     });
 });
 </script>

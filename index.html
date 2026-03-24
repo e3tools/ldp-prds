@@ -309,7 +309,14 @@
         </table>
 
         <h4>Tab: Map</h4>
-        <p>Interactive Leaflet.js map showing all villages within the canton. Each village is represented by a circle marker colored by its top-priority sector. Clicking a marker opens a popup with the priority name, estimated cost, and funding status. A sidebar lists all subprojects, and clicking an item flies the map to that village.</p>
+        <p>Interactive Leaflet.js map showing all villages within the canton with three switchable layers, mirroring the Commune Profile map functionality:</p>
+        <table>
+            <tr><th>Layer</th><th>Marker Style</th><th>Purpose</th></tr>
+            <tr><td><strong>Priorities</strong> (default)</td><td>Solid circle colored by sector; grey for villages without a priority</td><td>Show geographic distribution of investment priorities by sector</td></tr>
+            <tr><td><strong>Subprojects</strong></td><td>Larger semi-transparent ring, same sector color; only villages with an active subproject appear</td><td>Highlight villages that have a confirmed subproject</td></tr>
+            <tr><td><strong>Planning Progress</strong></td><td>Solid circle colored green (completed), yellow (in progress), or red (not started)</td><td>Visualize the planning cycle status of each village spatially</td></tr>
+        </table>
+        <p>Clicking any marker opens a popup with contextual detail for the active layer. A sidebar lists all subprojects with color-coded sector borders; clicking an item flies the map to that village and opens its popup. The legend updates automatically when switching layers.</p>
 
         <h4>Tab: Infrastructure &amp; Services</h4>
         <p>Placeholder for future development. Will show infrastructure inventory across villages (schools, health centers, water points, roads).</p>
@@ -537,14 +544,17 @@
 
         <div class="story-card">
             <div class="story-id">US-C03 — Canton investment map</div>
-            <div class="story-text">"As a Canton Chief, I want to see where investment priorities are located on a map so that I can understand the geographic distribution of needs."</div>
+            <div class="story-text">"As a Canton Chief, I want to see where investment priorities, subprojects, and planning progress are located on a map so that I can understand the geographic distribution of needs and progress."</div>
             <div class="ac-title">Acceptance Criteria</div>
             <ul>
                 <li>Map renders with OpenStreetMap tiles centered on the canton's geographic bounds</li>
-                <li>Each village with a priority shows a circle marker colored by sector</li>
-                <li>Clicking a marker shows popup with: village name, sector, priority description, estimated cost, funding status</li>
-                <li>Sidebar lists all subprojects; clicking an item pans/zooms the map to that village</li>
-                <li>Legend shows sector-to-color mapping</li>
+                <li>Three layer toggle buttons are visible: Priorities, Subprojects, Planning Progress</li>
+                <li><strong>Priorities layer:</strong> each village with a priority shows a solid circle marker colored by sector; villages without a priority show a small grey marker</li>
+                <li><strong>Subprojects layer:</strong> only villages with an active subproject appear, shown as larger semi-transparent rings in the sector color</li>
+                <li><strong>Planning Progress layer:</strong> all villages appear colored green (completed), yellow (in progress), or red (not started)</li>
+                <li>Clicking a marker opens a popup with contextual detail matching the active layer</li>
+                <li>Sidebar lists all subprojects with sector color borders; clicking an item pans/zooms the map to that village</li>
+                <li>Legend updates automatically when switching layers</li>
             </ul>
         </div>
 
