@@ -160,6 +160,7 @@
             <div class="sidebar-section-title">Document</div>
             <a href="#overview"><i class="fas fa-eye"></i> Overview</a>
             <a href="#hierarchy"><i class="fas fa-sitemap"></i> Admin Hierarchy</a>
+            <a href="#users"><i class="fas fa-users"></i> Users</a>
             <a href="#proto-canton"><i class="fas fa-layer-group"></i> Canton Profile</a>
             <a href="#proto-commune"><i class="fas fa-city"></i> Commune Profile</a>
             <a href="#proto-gallery"><i class="fas fa-images"></i> Gallery</a>
@@ -237,12 +238,12 @@
         </table>
 
         <h3>1.3 Target Users</h3>
+        <p>Three primary user types are in scope for v1. See <a href="#users">Section 3 — Users</a> for full personas, goals, pain points, and the future user roadmap.</p>
         <table>
             <tr><th>User</th><th>Role</th><th>Primary Need</th></tr>
-            <tr><td>Canton Chief / Arrondissement Officer</td><td>Local government official</td><td>Track which villages have completed their planning cycle and identify lagging ones</td></tr>
-            <tr><td>Commune Mayor / Municipal Officer</td><td>Municipal authority</td><td>Overview of all cantons, funding gaps, geographic priority distribution</td></tr>
-            <tr><td>World Bank Project Manager</td><td>Donor / oversight</td><td>Portfolio-wide progress dashboards, evidence of field activities via gallery</td></tr>
-            <tr><td>Facilitator / Field Agent</td><td>Operational staff</td><td>Upload and browse evidence, verify task completion through photos</td></tr>
+            <tr><td><strong>Government Official</strong></td><td>National / departmental government</td><td>Understand what investment priorities exist across the country and track development progress</td></tr>
+            <tr><td><strong>Manager</strong></td><td>Investment approval authority</td><td>Review priority submissions from partners, approve or reject funding commitments</td></tr>
+            <tr><td><strong>Partner / Investor</strong></td><td>Development partner, NGO, donor</td><td>Browse unfunded priorities and commit investment (Add to Cart metaphor)</td></tr>
         </table>
 
         <!-- ════════════════════════════════════════════════════
@@ -268,9 +269,114 @@
         </div>
 
         <!-- ════════════════════════════════════════════════════
-             3. CANTON PROFILE
+             3. USERS
              ════════════════════════════════════════════════════ -->
-        <h2 id="proto-canton">3. Canton Profile</h2>
+        <h2 id="users">3. Users</h2>
+
+        <h3>3.1 Primary Users (v1 Scope)</h3>
+        <p>These three user types are the primary audience for the current version of COSOMIS LDP. All prototypes and user stories are designed around their needs.</p>
+
+        <!-- Government Official -->
+        <div class="callout callout-blue" style="margin-bottom: 24px;">
+            <div style="display:flex; align-items:flex-start; gap: 16px;">
+                <div style="font-size: 32px; line-height:1;">🏛️</div>
+                <div style="flex:1;">
+                    <strong style="font-size:16px;">Government Official</strong>
+                    <div style="font-size: 12px; color: #555; margin-bottom: 8px;">National / Departmental Authority — e.g. Ministry of Local Development, Departmental Prefect</div>
+                    <table style="margin:0; font-size:13px;">
+                        <tr><th style="width:160px;">Goals</th><td>Understand what investment priorities exist across the country; track planning progress of villages, cantons, and communes; produce reports for donors and oversight bodies</td></tr>
+                        <tr><th>Pain Points</th><td>Data is scattered across village-level records with no rolled-up view; hard to identify which regions are lagging or have unfunded priorities</td></tr>
+                        <tr><th>Key Actions</th><td>Browse Canton and Commune profiles; view map layers to spot geographic concentration of needs; export or screenshot data for ministerial reports</td></tr>
+                        <tr><th>Success looks like</th><td>Can answer "Which communes have the most unfunded priorities?" in under 2 minutes without asking anyone</td></tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Manager -->
+        <div class="callout" style="border-left-color: #805ad5; background: #faf5ff; margin-bottom: 24px;">
+            <div style="display:flex; align-items:flex-start; gap: 16px;">
+                <div style="font-size: 32px; line-height:1;">✅</div>
+                <div style="flex:1;">
+                    <strong style="font-size:16px;">Manager</strong>
+                    <div style="font-size: 12px; color: #555; margin-bottom: 8px;">Investment Approval Authority — e.g. World Bank Project Manager, CDD Program Coordinator</div>
+                    <table style="margin:0; font-size:13px;">
+                        <tr><th style="width:160px;">Goals</th><td>Review investment priority submissions from Partners; approve or reject funding commitments; ensure equitable distribution of investment across communities</td></tr>
+                        <tr><th>Pain Points</th><td>No unified inbox of pending partner submissions; must chase emails to know what Partners have "added to cart"; hard to check whether vulnerable groups are represented in proposed priorities</td></tr>
+                        <tr><th>Key Actions</th><td>Review the priorities queue; approve or reject partner investment submissions; filter priorities by endorsement group (Women, Youth, Elders, Agri) and funding status; track investment equity per capita across villages</td></tr>
+                        <tr><th>Success looks like</th><td>Can review all pending partner submissions in one place and approve/reject with a single click; zero missed submissions</td></tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Partner / Investor -->
+        <div class="callout" style="border-left-color: #dd6b20; background: #fffaf0; margin-bottom: 24px;">
+            <div style="display:flex; align-items:flex-start; gap: 16px;">
+                <div style="font-size: 32px; line-height:1;">🤝</div>
+                <div style="flex:1;">
+                    <strong style="font-size:16px;">Partner / Investor</strong>
+                    <div style="font-size: 12px; color: #555; margin-bottom: 8px;">Development Partner, NGO, Bilateral Donor — e.g. UNICEF, AFD, local NGO</div>
+                    <table style="margin:0; font-size:13px;">
+                        <tr><th style="width:160px;">Goals</th><td>Discover unfunded community priorities that match their mandate; commit funding to specific priorities; track the status of their commitments after submission</td></tr>
+                        <tr><th>Pain Points</th><td>No single place to browse what communities actually need; must attend in-person meetings to know what's available; funding pipeline is opaque after submission</td></tr>
+                        <tr><th>Key Actions</th><td>"Add to Cart" to express intent to fund a priority; filter priorities by sector, region, cost range, and vulnerable group alignment; submit cart for Manager review; track submission status</td></tr>
+                        <tr><th>Success looks like</th><td>Can discover and commit to a matching priority in under 10 minutes; knows immediately when Manager approves or requests changes</td></tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="callout callout-blue">
+            <strong>The "Add to Cart" metaphor:</strong> Partners browse unfunded priorities like products in an e-commerce catalog. They "add to cart" to signal funding intent. The Manager then reviews the cart contents and either approves (converting the priority to "Funded") or rejects the submission with a reason. This separates the discovery experience (Partner) from the approval gatekeeping (Manager).
+        </div>
+
+        <h3>3.2 Future Users (Exploratory)</h3>
+        <p>The following users were not in scope for v1 but are strong candidates for future iterations. Including them here informs design decisions so we don't inadvertently close off these use cases.</p>
+
+        <table>
+            <tr>
+                <th>User</th>
+                <th>Level</th>
+                <th>What they would need</th>
+                <th>Why deferred</th>
+            </tr>
+            <tr>
+                <td><strong>Canton Government Worker</strong><br><small>(Arrondissement Officer, CDD Facilitator at Canton)</small></td>
+                <td>Canton</td>
+                <td>
+                    Manage the list of villages under their canton; input or validate priorities submitted by village committees; monitor planning cycle completion for each village; coordinate with Commune-level staff
+                </td>
+                <td>
+                    Canton-level data entry and workflow (priority validation, task status updates) requires a write-access model that is not yet defined for this level. The Canton Profile prototype covers the <em>read</em> side; the write side is a v2 consideration.
+                </td>
+            </tr>
+            <tr>
+                <td><strong>Commune Government Worker</strong><br><small>(Municipal Officer, Mairie staff)</small></td>
+                <td>Commune</td>
+                <td>
+                    Produce official investment reports for the commune; manage subproject list and funding allocations; coordinate with multiple cantons; interact with partner submissions that affect their commune
+                </td>
+                <td>
+                    The Commune Profile prototype covers dashboarding and monitoring. Full write access (subproject approval, budget allocation at commune level) requires integration with the existing subproject management workflow, which is a separate workstream.
+                </td>
+            </tr>
+            <tr>
+                <td><strong>Village Committee Member (CVD)</strong></td>
+                <td>Village</td>
+                <td>
+                    Enter their own village's priorities and track their planning cycle status; upload photos and documents as task evidence; see how their priorities rank against other villages
+                </td>
+                <td>
+                    Partially supported today via the existing Village Profile. Full self-service entry and mobile-first access is a future scope item.
+                </td>
+            </tr>
+        </table>
+
+        <!-- ════════════════════════════════════════════════════
+             4. CANTON PROFILE
+             ════════════════════════════════════════════════════ -->
+        <h2 id="proto-canton">4. Canton Profile</h2>
         <p><a href="canton_profile.html" target="_blank" style="color: var(--blue); font-weight: 600;"><i class="fas fa-external-link-alt"></i> Open prototype →</a></p>
 
         <h3>3.1 Purpose</h3>
@@ -368,7 +474,7 @@
         <!-- ════════════════════════════════════════════════════
              4. COMMUNE PROFILE
              ════════════════════════════════════════════════════ -->
-        <h2 id="proto-commune">4. Commune Profile</h2>
+        <h2 id="proto-commune">5. Commune Profile</h2>
         <p><a href="commune_profile.html" target="_blank" style="color: var(--blue); font-weight: 600;"><i class="fas fa-external-link-alt"></i> Open prototype →</a></p>
 
         <h3>4.1 Purpose</h3>
@@ -457,7 +563,7 @@
         <!-- ════════════════════════════════════════════════════
              5. GALLERY
              ════════════════════════════════════════════════════ -->
-        <h2 id="proto-gallery">5. Gallery</h2>
+        <h2 id="proto-gallery">6. Gallery</h2>
         <p><a href="gallery-prototype.html" target="_blank" style="color: var(--blue); font-weight: 600;"><i class="fas fa-external-link-alt"></i> Open prototype →</a></p>
 
         <h3>5.1 Purpose</h3>
@@ -514,13 +620,14 @@
         <!-- ════════════════════════════════════════════════════
              6. USER STORIES
              ════════════════════════════════════════════════════ -->
-        <h2 id="user-stories">6. User Stories</h2>
+        <h2 id="user-stories">7. User Stories</h2>
+        <p>Stories are written from the perspective of the three primary v1 users: <strong>Government Official</strong>, <strong>Manager</strong>, and <strong>Partner/Investor</strong>. Stories referencing Canton/Commune-level views are attributed to the Government Official, who uses these profiles for national oversight.</p>
 
-        <h3>6.1 Canton Profile Stories</h3>
+        <h3>7.1 Canton Profile Stories</h3>
 
         <div class="story-card">
             <div class="story-id">US-C01 — Canton overview</div>
-            <div class="story-text">"As a Canton Chief, I want to see a summary of all villages under my jurisdiction so that I can quickly assess the overall population and number of priorities."</div>
+            <div class="story-text">"As a Government Official, I want to see a summary of all villages under a canton so that I can quickly assess the overall population and number of priorities without digging into individual village records."</div>
             <div class="ac-title">Acceptance Criteria</div>
             <ul>
                 <li>Population card shows aggregated demographics (total, men, women, young, elder, disabilities, agriculture, breeders, ethnic groups) summed from all child villages</li>
@@ -531,7 +638,7 @@
 
         <div class="story-card">
             <div class="story-id">US-C02 — Village progress funnel</div>
-            <div class="story-text">"As a Canton Chief, I want to see which villages have completed their planning cycle and which are lagging, so that I can focus my support on villages that need it most."</div>
+            <div class="story-text">"As a Government Official, I want to see which villages within a canton have completed their planning cycle and which are lagging, so that I can identify where program support is most needed."</div>
             <div class="ac-title">Acceptance Criteria</div>
             <ul>
                 <li>Summary counters show correct counts for completed, in-progress, and not-started villages</li>
@@ -544,7 +651,7 @@
 
         <div class="story-card">
             <div class="story-id">US-C03 — Canton investment map</div>
-            <div class="story-text">"As a Canton Chief, I want to see where investment priorities, subprojects, and planning progress are located on a map so that I can understand the geographic distribution of needs and progress."</div>
+            <div class="story-text">"As a Government Official, I want to see where investment priorities, subprojects, and planning progress are located on a map so that I can understand the geographic distribution of needs and identify underserved areas."</div>
             <div class="ac-title">Acceptance Criteria</div>
             <ul>
                 <li>Map renders with OpenStreetMap tiles centered on the canton's geographic bounds</li>
@@ -560,7 +667,7 @@
 
         <div class="story-card">
             <div class="story-id">US-C04 — Canton priorities table</div>
-            <div class="story-text">"As a World Bank PM, I want to review all investment priorities in a canton with their endorsement status, so that I can evaluate whether vulnerable groups are represented."</div>
+            <div class="story-text">"As a Manager, I want to review all investment priorities in a canton with their endorsement and funding status, so that I can evaluate whether vulnerable groups are represented and which priorities are awaiting partner funding."</div>
             <div class="ac-title">Acceptance Criteria</div>
             <ul>
                 <li>Priorities table shows all investments from child villages with endorsement indicators (J, F, ME, AE)</li>
@@ -569,11 +676,11 @@
             </ul>
         </div>
 
-        <h3>6.2 Commune Profile Stories</h3>
+        <h3>7.2 Commune Profile Stories</h3>
 
         <div class="story-card">
             <div class="story-id">US-M01 — Canton-aggregated progress</div>
-            <div class="story-text">"As a Commune Mayor, I want to see planning progress grouped by canton so that I can compare cantons and know which ones are falling behind."</div>
+            <div class="story-text">"As a Government Official, I want to see planning progress grouped by canton within a commune so that I can compare cantons and identify which ones are falling behind."</div>
             <div class="ac-title">Acceptance Criteria</div>
             <ul>
                 <li>Each canton appears as a collapsible accordion block with header showing: canton name, village count, completion %, mini progress bar, and status counts</li>
@@ -585,7 +692,7 @@
 
         <div class="story-card">
             <div class="story-id">US-M02 — Investment equity analysis</div>
-            <div class="story-text">"As a Commune Mayor, I want to compare per-capita investment across villages so that I can identify underserved communities."</div>
+            <div class="story-text">"As a Manager, I want to compare per-capita investment across villages within a commune so that I can identify underserved communities and ensure equitable distribution of partner funding."</div>
             <div class="ac-title">Acceptance Criteria</div>
             <ul>
                 <li>Villages tab shows per capita invested (total_funded / population) and per capita required (estimated_cost / population)</li>
@@ -596,7 +703,7 @@
 
         <div class="story-card">
             <div class="story-id">US-M03 — Multi-layer map</div>
-            <div class="story-text">"As a World Bank PM, I want to switch between different map views (priorities, subprojects, planning progress) so that I can analyze geographic patterns from different angles."</div>
+            <div class="story-text">"As a Government Official, I want to switch between different map views (priorities, subprojects, planning progress) so that I can analyze geographic patterns from different angles for reporting and oversight."</div>
             <div class="ac-title">Acceptance Criteria</div>
             <ul>
                 <li>Three toggle buttons switch the active map layer: Priorities, Subprojects, Planning Progress</li>
@@ -608,7 +715,7 @@
 
         <div class="story-card">
             <div class="story-id">US-M04 — Priority filtering</div>
-            <div class="story-text">"As a Municipal Officer, I want to filter investment priorities by sector, endorsement group, and funding status so that I can prepare targeted reports."</div>
+            <div class="story-text">"As a Manager, I want to filter investment priorities by sector, endorsement group, and funding status so that I can prepare targeted reports for oversight bodies and verify that vulnerable group representation meets program requirements."</div>
             <div class="ac-title">Acceptance Criteria</div>
             <ul>
                 <li>Filter bar provides 5 dropdowns: Sector, Type, Endorsed By, Climate Contribution, Funding Status</li>
@@ -618,11 +725,53 @@
             </ul>
         </div>
 
-        <h3>6.3 Gallery Stories</h3>
+        <h3>7.3 Partner &amp; Manager Stories</h3>
+
+        <div class="story-card">
+            <div class="story-id">US-P01 — Discover fundable priorities</div>
+            <div class="story-text">"As a Partner/Investor, I want to browse unfunded community priorities filtered by sector, region, and cost so that I can find priorities that match my organization's mandate and budget."</div>
+            <div class="ac-title">Acceptance Criteria</div>
+            <ul>
+                <li>Priorities list can be filtered by sector, administrative region (commune/canton), estimated cost range, and vulnerable group alignment</li>
+                <li>Each priority card shows: community name, sector, description, estimated cost, endorsement groups, and current funding status</li>
+                <li>Unfunded priorities display an "Add to Cart" button; already-funded ones are clearly marked as funded</li>
+                <li>Filter state persists as the user browses</li>
+            </ul>
+        </div>
+
+        <div class="story-card">
+            <div class="story-id">US-P02 — Add priority to cart</div>
+            <div class="story-text">"As a Partner/Investor, I want to add unfunded priorities to a cart and submit my funding intent so that the Manager can review and approve my commitment."</div>
+            <div class="ac-title">Acceptance Criteria</div>
+            <ul>
+                <li>Clicking "Add to Cart" marks the priority in a session cart with a visual indicator</li>
+                <li>Cart badge in the header shows the current count of selected priorities</li>
+                <li>Cart summary page shows all selected priorities with total estimated investment amount</li>
+                <li>Partner can remove items from cart before submitting</li>
+                <li>Submitting the cart creates a pending submission visible to the Manager</li>
+                <li>Partner receives on-screen confirmation and can track submission status</li>
+            </ul>
+        </div>
+
+        <div class="story-card">
+            <div class="story-id">US-MG01 — Review partner submissions</div>
+            <div class="story-text">"As a Manager, I want to see all pending partner funding submissions in one place so that I can review, approve, or reject them without missing any."</div>
+            <div class="ac-title">Acceptance Criteria</div>
+            <ul>
+                <li>Submissions queue shows all pending carts grouped by Partner, with submission date and total value</li>
+                <li>Expanding a submission shows each priority with its details and endorsement indicators</li>
+                <li>Manager can approve or reject individual priorities within a cart, or the entire cart at once</li>
+                <li>Rejecting requires a reason; the reason is communicated back to the Partner</li>
+                <li>Approved priorities automatically update their status to "Funded" in the priorities tables and map layers</li>
+                <li>Manager receives a notification when new submissions arrive</li>
+            </ul>
+        </div>
+
+        <h3>7.4 Gallery Stories</h3>
 
         <div class="story-card">
             <div class="story-id">US-G01 — Browse field evidence</div>
-            <div class="story-text">"As a World Bank PM, I want to browse all photos collected from the field filtered by location and planning phase, so that I can verify activities are actually taking place."</div>
+            <div class="story-text">"As a Manager, I want to browse all photos collected from the field filtered by location and planning phase, so that I can verify activities are actually taking place and have evidence for donor reporting."</div>
             <div class="ac-title">Acceptance Criteria</div>
             <ul>
                 <li>Gallery grid shows photo thumbnails with village name, task title, status, and date</li>
@@ -647,7 +796,7 @@
 
         <div class="story-card">
             <div class="story-id">US-G03 — Bulk download</div>
-            <div class="story-text">"As a World Bank PM, I want to select multiple photos and download them as a ZIP file, so that I can include field evidence in my reports."</div>
+            <div class="story-text">"As a Manager or Government Official, I want to select multiple photos and download them as a ZIP file, so that I can include field evidence in donor reports and official documentation."</div>
             <div class="ac-title">Acceptance Criteria</div>
             <ul>
                 <li>Each card has a checkbox that becomes visible on hover or when checked</li>
@@ -670,7 +819,7 @@
         <!-- ════════════════════════════════════════════════════
              7. USER FLOWS
              ════════════════════════════════════════════════════ -->
-        <h2 id="user-flows">7. User Flows</h2>
+        <h2 id="user-flows">8. User Flows</h2>
 
         <h3>7.1 Flow: Canton chief monitors village progress</h3>
         <div class="flow-row">
@@ -739,7 +888,7 @@
         <!-- ════════════════════════════════════════════════════
              8. HYPOTHESES
              ════════════════════════════════════════════════════ -->
-        <h2 id="hypotheses">8. Hypotheses</h2>
+        <h2 id="hypotheses">9. Hypotheses</h2>
 
         <table>
             <tr><th style="width:40px">#</th><th>Hypothesis</th><th>Evidence Needed</th><th>Risk if Wrong</th></tr>
@@ -784,7 +933,7 @@
         <!-- ════════════════════════════════════════════════════
              9. SUCCESS METRICS
              ════════════════════════════════════════════════════ -->
-        <h2 id="success-metrics">9. Success Metrics</h2>
+        <h2 id="success-metrics">10. Success Metrics</h2>
 
         <h3>9.1 Adoption Metrics</h3>
         <table>
